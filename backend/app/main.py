@@ -3,6 +3,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from .core.task_manager import TaskManager
 from .models.schemas import OptimizationRequest, TaskResponse
 import asyncio
+import logging 
+import sys
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),  # Print to console
+        logging.FileHandler('app.log')      # Also save to file
+    ]
+)
+
+# Create logger for this file
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 task_manager = TaskManager()
@@ -30,6 +45,7 @@ async def task_websocket(websocket: WebSocket, task_id: str):
     try:
         optimizer = task_manager.active_tasks.get(task_id)
         if not optimizer:
+            logger.info("optimizer is null")
             await websocket.close(code=4004)
             return
 
@@ -38,4 +54,5 @@ async def task_websocket(websocket: WebSocket, task_id: str):
 
         await optimizer.evolve(task_id, update_callback)
     except Exception as e:
+        logger.info(e)
         await websocket.close(code=1011)

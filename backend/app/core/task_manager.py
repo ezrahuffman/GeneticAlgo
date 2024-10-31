@@ -1,5 +1,5 @@
-from typing import Dict, Optional
-from datetime import datetime
+from typing import Dict
+from datetime import datetime, timezone
 import asyncio
 import uuid
 from .optimizer import GeneticOptimizer
@@ -26,7 +26,7 @@ class TaskManager:
             self.active_tasks[task_id] = optimizer
             self.task_results[task_id] = []
             self.task_metadata[task_id] = {
-                'created_at': datetime.now(datetime.timezone.utc),
+                'created_at': datetime.now(timezone.utc),
                 'status': 'initialized',
                 'config': config
             }
@@ -34,7 +34,7 @@ class TaskManager:
             return task_id
         
     async def _cleanup_old_tasks(self) -> None:
-        current_time = datetime.now(datetime.timezon.utc)
+        current_time = datetime.now(timezone.utc)
         tasks_to_remove = []
 
         for task_id, metadata in self.task_metadata.items():
