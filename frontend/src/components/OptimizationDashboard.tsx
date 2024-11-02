@@ -35,17 +35,22 @@ export const OptimizationDashboard: React.FC = () => {
         body: JSON.stringify({
           problem_type: 'tsp',
           population_size: 50,
-          dimension: 5,
-          mutation_rate: 0.1,
+          dimension: 10,
+          mutation_rate: 0.5,
           crossover_rate: 0.8,
           max_generations: 100,
           parameters: {
             cities: [
               [0, 0],
-              [1, 5],
-              [2, 2],
-              [3, 7],
-              [5, 3]
+              [1, 3],
+              [2, 1],
+              [3, 9],
+              [5, 3],
+              [0, 10],
+              [1, 8],
+              [21, 1],
+              [3, 59],
+              [5, 13],
             ]
           }
         }),
@@ -115,6 +120,7 @@ export const OptimizationDashboard: React.FC = () => {
     ws.onclose = () => {
       console.log('WebSocket connection closed');
       setWsStatus('disconnected');
+      setIsRunning(false)
     };
 
     ws.onerror = (error) => {

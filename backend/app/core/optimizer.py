@@ -166,7 +166,8 @@ class GeneticOptimizer:
         offspring = self._crossover(parents1, parents2)
         self.population = self._mutate(offspring)           
 
-    async def evolve(self, task_id: str, update_callback) -> None:
+
+    async def evolve(self, task_id: str, update_callback, close_callback) -> None:
         try:
                 while self.generation < 100:
                     # Process generation
@@ -195,7 +196,8 @@ class GeneticOptimizer:
                     
                     # Control evolution speed
                     await asyncio.sleep(0.1)
-                    self.generation += 1        
+                    self.generation += 1   
+                await close_callback()
         except Exception as e:
             logger.error(f"Error in generation {self.generation}: {str(e)}")
             raise
