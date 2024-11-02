@@ -21,6 +21,7 @@ class GeneticOptimizer:
         self.population = self._initialize_population()
         self.best_solution = None
         self.best_fitness = float('-inf')
+        self.max_generations = config.get('max_generations', 100)
 
         # Generate dummy cities if not provided
         if self.problem_type == 'tsp' and 'parameters' not in config:
@@ -169,7 +170,7 @@ class GeneticOptimizer:
 
     async def evolve(self, task_id: str, update_callback, close_callback) -> None:
         try:
-                while self.generation < 100:
+                while self.generation < self.max_generations:
                     # Process generation
                     fitness_values = self._evaluate_population()
                     self._update_best_solution(fitness_values)

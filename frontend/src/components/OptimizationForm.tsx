@@ -53,7 +53,7 @@ interface City extends Array<number> {
       defaultValues: {
         problem_type: 'tsp',
         population_size: 50,
-        dimension: 10,
+        dimension: 5,
         mutation_rate: 0.5,
         crossover_rate: 0.8,
         max_generations: 100,
