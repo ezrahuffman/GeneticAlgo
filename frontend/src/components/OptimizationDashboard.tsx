@@ -89,27 +89,26 @@ export const OptimizationDashboard: React.FC = () => {
     };
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Received update:', data);
-      
-      setEvolutionData(prev => [...prev, {
-        generation: data.generation,
-        best_fitness: -data.best_fitness, // Convert back to positive for display
-        average_fitness: data.average_fitness ? -data.average_fitness : undefined,
-        population_diversity: data.population_diversity
-      }]);
-
-      if (data.status === 'completed') {
-        setIsRunning(false);
-        setWsStatus('disconnected');
-        ws.close();
-        // toast({
-        //   title: 'Optimization Complete',
-        //   description: 'The genetic algorithm has finished running',
-        //   status: 'success',
-        //   duration: 5000,
-        //   isClosable: true,
-        // });
+      try {
+        // Parse the incoming WebSocket data
+        const data = JSON.parse(event.data);
+        console.log('Received update:', data);
+        
+        // Verify data exists and has the required properties
+        if (data && typeof data.best_fitness === 'number') {
+          setEvolutionData(prev => [...prev, {
+            generation: data.generation,
+            best_fitness: data.best_fitness,  // Keep original value, handle display logic in chart
+            averageFitness: data.average_fitness,
+            populationDiversity: data.population_diversity,
+            status: data.status
+          }]);
+        } else {
+          console.error('Received malformed data:', data);
+          console.error('Type of data.best_fitness:', typeof data.best_fitness);
+        }
+      } catch (error) {
+        console.error('Error processing WebSocket message:', error);
       }
     };
 

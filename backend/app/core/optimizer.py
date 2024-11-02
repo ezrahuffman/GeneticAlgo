@@ -55,7 +55,6 @@ class GeneticOptimizer:
     def _evaluate_population(self) -> np.ndarray:
         fitness = np.zeros(self.population_size)
 
-        logger.info("start to evaluate population")
         for i in range(self.population_size):
             # calculations for distance and routes don't make much sense at the moment
             # should be something like sqrt(x^2 + y^2) where x is x distance between cities and likewise for y
@@ -72,7 +71,6 @@ class GeneticOptimizer:
                 # function optimization uses a test function 
                 x = self.population[i]
                 fitness[i] = -np.sum(x**2)
-        logger.info("evaluated population")
         return fitness
     
     def _select_parents(self, fitness: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -84,12 +82,13 @@ class GeneticOptimizer:
         for i in range(self.population_size):
             #tournament for parent one
             canidates = np.random.choice(self.population_size, tournament_size)
-            parent1_idx = canidates[np.argmax(fitness[canidates])]
+            parent1_idx[i] = canidates[np.argmax(fitness[canidates])]
 
             #tournament for parent two
             canidates = np.random.choice(self.population_size, tournament_size)
-            parent2_idx = canidates[np.argmax(fitness[canidates])]
+            parent2_idx[i] = canidates[np.argmax(fitness[canidates])]
         
+        logger.info(f"self.population[parent1_idx].shape {self.population[parent1_idx].shape}")
         return self.population[parent1_idx], self.population[parent2_idx]
 
     def _crossover(self, parents1: np.ndarray, parents2: np.ndarray) -> np.ndarray:
@@ -138,7 +137,6 @@ class GeneticOptimizer:
                     offspring[i] = alpha * parents1[i] + (1 - alpha) * parents2[i]
             else:
                 offspring[i] = parents1[i]
-        logger.info("after crossover loop")
 
         return offspring
     
@@ -165,9 +163,7 @@ class GeneticOptimizer:
     def _create_next_generation(self, fitness: np.ndarray) -> None:
         # use selection, mutation, and crossover to create next generation
         parents1, parents2 = self._select_parents(fitness)
-        logger.info("after select parents")
         offspring = self._crossover(parents1, parents2)
-        logger.info("after offspring")
         self.population = self._mutate(offspring)           
 
     async def evolve(self, task_id: str, update_callback) -> None:
@@ -175,11 +171,8 @@ class GeneticOptimizer:
                 while self.generation < 100:
                     # Process generation
                     fitness_values = self._evaluate_population()
-                    logger.info("after eval population")
                     self._update_best_solution(fitness_values)
-                    logger.info("after best solution")
                     self._create_next_generation(fitness_values)
-                    logger.info("after next generation")
                     
                     # Calculate additional metrics
                     #avg_fitness = np.mean(fitness_values)
@@ -196,10 +189,9 @@ class GeneticOptimizer:
                         'population_diversity': 14,
                         'status': 'running'
                     }
-                    # Convert Python to JSON  
-                    json_object = json.dumps(update_data, indent = 4)
-                    logger.info(f"Generation {self.generation} complete. Best fitness: {self.best_fitness}")
-                    await update_callback(json_object)
+                    
+                    #logger.info(f"Generation {self.generation} complete. Best fitness: {self.best_fitness}")
+                    await update_callback(update_data)
                     
                     # Control evolution speed
                     await asyncio.sleep(0.1)
