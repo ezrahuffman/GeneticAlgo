@@ -183,7 +183,7 @@ class GeneticOptimizer:
                     update_data = {
                         'task_id': task_id,
                         'generation': self.generation,
-                        'best_fitness': float(self.best_fitness),
+                        'best_fitness': -float(self.best_fitness),
                         'current_fitness': 14,
                         #'best_solution': self.population[0].tolist(),
                         'average_fitness': 14,
