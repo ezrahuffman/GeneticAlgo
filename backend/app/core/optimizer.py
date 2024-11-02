@@ -186,7 +186,7 @@ class GeneticOptimizer:
                         'generation': self.generation,
                         'best_fitness': -float(self.best_fitness),
                         'current_fitness': 14,
-                        #'best_solution': self.population[0].tolist(),
+                        'best_solution': self.best_solution.tolist(),
                         'average_fitness': 14,
                         'population_diversity': 14,
                         'status': 'running'
