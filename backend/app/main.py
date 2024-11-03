@@ -2,7 +2,6 @@ from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .core.task_manager import TaskManager
 from .models.schemas import OptimizationRequest, TaskResponse
-import asyncio
 import logging 
 import sys
 

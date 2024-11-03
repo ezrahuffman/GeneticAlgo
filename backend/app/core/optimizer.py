@@ -2,7 +2,6 @@ import numpy as np
 from typing import List, Tuple
 import asyncio
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -177,18 +176,18 @@ class GeneticOptimizer:
                     self._create_next_generation(fitness_values)
                     
                     # Calculate additional metrics
-                    #avg_fitness = np.mean(fitness_values)
-                    #diversity = np.std(fitness_values)
+                    avg_fitness = np.mean(fitness_values)
+                    diversity = np.std(fitness_values)
                     
                     # Send update
                     update_data = {
                         'task_id': task_id,
                         'generation': self.generation,
                         'best_fitness': -float(self.best_fitness),
-                        'current_fitness': 14,
+                        #'current_fitness': 14,
                         'best_solution': self.best_solution.tolist(),
-                        'average_fitness': 14,
-                        'population_diversity': 14,
+                        'average_fitness': avg_fitness,
+                        'population_diversity': diversity,
                         'status': 'running'
                     }
                     
