@@ -4,6 +4,7 @@ from .core.task_manager import TaskManager
 from .models.schemas import OptimizationRequest, TaskResponse
 import logging 
 import sys
+import os
 
 # Configure logging
 logging.basicConfig(
@@ -21,14 +22,22 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 task_manager = TaskManager()
 
+# Get environment variables with defaults
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+PORT = int(os.getenv('PORT', 8000))
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/health")
+async def health_check():
+    return {"status":"healthy"}
 
 @app.post("/api/tasks", response_model=TaskResponse)
 async def create_task(request: OptimizationRequest):
@@ -52,9 +61,11 @@ async def task_websocket(websocket: WebSocket, task_id: str):
             await websocket.send_json(data)
 
         async def close_callback():
+            task_manager.remove_task(task_id)
             await websocket.close()
 
         await optimizer.evolve(task_id, update_callback, close_callback)
     except Exception as e:
         logger.info(e)
+        task_manager.remove_task(task_id)
         await websocket.close(code=1011)

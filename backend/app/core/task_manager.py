@@ -47,3 +47,8 @@ class TaskManager:
             self.active_tasks.pop(task_id, None)
             self.task_results.pop(task_id, None)
             self.task_metadata.pop(task_id, None)
+
+    async def remove_task(self, task_id: str) -> None:
+        self.active_tasks.pop(task_id, None)
+        self.task_results.pop(task_id, None)
+        self.task_metadata.pop(task_id, None)
