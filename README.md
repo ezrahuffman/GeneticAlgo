@@ -1,7 +1,5 @@
 # TSP Solver: Genetic Algorithm Visualization
 
-![Project Banner](/api/placeholder/1200/400)
-
 A real-time visualization platform for genetic algorithms solving the Traveling Salesman Problem (TSP). Watch evolution in action as the algorithm discovers increasingly efficient routes between cities.
 
 ## 🌟 Key Features
@@ -74,7 +72,6 @@ graph LR
 
 ### Backend
 - FastAPI
-- Pydantic for data validation
 - NumPy for genetic algorithm operations
 - Asyncio for concurrent task handling
 
@@ -126,7 +123,7 @@ This project demonstrates several modern web development concepts:
 
 ## 🤝 Contact
 
-If you are looking to hire, please feel free to reach out to me here or on LinkedIn. (I don't want to put my contact info in a public repo)
+If you are looking to hire, please feel free to reach out to me here or on [LinkedIn](https://www.linkedin.com/in/ezra-huffman/). (I don't want to put my contact info in a public repo)
 
 ## 📝 License
 
