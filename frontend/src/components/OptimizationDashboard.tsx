@@ -7,7 +7,7 @@ import {
 } from "./ui/card";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import OptimizationForm from './OptimizationForm';
-import { config } from '../config';
+//import { config } from '../config';
 
 type City = {
   x: number;
@@ -140,7 +140,7 @@ export const OptimizationDashboard: React.FC = () => {
   const startNewTask = async (formData: any) => {
     try {
       console.log('Starting new optimization task...', formData);
-      const response = await fetch(`${config.apiUrl}/api/tasks`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export const OptimizationDashboard: React.FC = () => {
     console.log(`Connecting to WebSocket for task ${taskId}...`);
     setWsStatus('connecting');
 
-    const ws = new WebSocket(`${config.wsUrl}/ws/tasks/${taskId}`);
+    const ws = new WebSocket(`${process.env.REACT_APP_WS_URL}/ws/tasks/${taskId}`);
 
     ws.onopen = () => {
       console.log('WebSocket connected');
