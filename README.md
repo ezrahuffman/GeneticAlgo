@@ -10,6 +10,10 @@ A real-time visualization platform for genetic algorithms solving the Traveling 
 - **Performance Metrics**: Track best fitness, average fitness, and population diversity across generations
 - **WebSocket Integration**: Live updates ensure smooth, real-time data flow between the optimization engine and UI
 
+## Use it now
+- https://geneticalgo.netlify.app/
+
+
 ## 🧬 How It Works
 
 ### The Genetic Algorithm
@@ -117,7 +121,7 @@ This project demonstrates several modern web development concepts:
 
 ## 🛠️ Future Enhancements
 
-- [ ] Hosting (this should be done very soon), so you can access the application without having to launch it locally
+- [X] Hosting (this should be done very soon), so you can access the application without having to launch it locally
 - [ ] Additional optimization problems (function optimization, knapsack problem)
 - [ ] Performance improvements for larger city sets
 
