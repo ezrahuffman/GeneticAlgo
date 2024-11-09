@@ -133,6 +133,7 @@ export const OptimizationDashboard: React.FC = () => {
   const [evolutionData, setEvolutionData] = React.useState<EvolutionData[]>([]);
   const [currentTask, setCurrentTask] = React.useState<string | null>(null);
   const [isRunning, setIsRunning] = React.useState(false);
+  // eslint-disable-next-line
   const [wsStatus, setWsStatus] = React.useState<string>('disconnected');
   const [cities, setCities] = React.useState<City[]>([]);
   
