@@ -3,7 +3,7 @@ import time
 import os
 from datetime import datetime
 
-API_URL = os.getenv('API_URL', 'https://your-backend-url.onrender.com')
+API_URL = os.getenv('API_URL', 'https://geneticalgo.onrender.com')
 
 def ping_server():
     while True:
