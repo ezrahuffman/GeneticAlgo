@@ -51,7 +51,6 @@ graph LR
    - Manages optimization parameters through forms
    - Renders real-time visualizations using SVG
    - Plots performance metrics with Recharts
-   - Uses shadcn/ui for a modern, accessible interface
 
 2. **Backend (FastAPI + Python)**
    - Handles WebSocket connections for live updates
@@ -69,7 +68,6 @@ graph LR
 ### Frontend
 - React 18
 - TypeScript
-- shadcn/ui components
 - Recharts for data visualization
 - Tailwind CSS for styling
 - WebSocket for real-time communication
