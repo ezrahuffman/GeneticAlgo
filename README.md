@@ -77,7 +77,7 @@ graph LR
 - NumPy for genetic algorithm operations
 - Asyncio for concurrent task handling
 
-## 🎮 Getting Started
+## 🤝 Contributing
 
 1. **Clone and Install**
    ```bash
@@ -95,6 +95,11 @@ graph LR
 3. **Access the Application**
    - Frontend: http://localhost:3000
    - Backend: http://localhost:8000
+     
+
+### Submit a pull request
+
+If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
 
 ## 🔧 Configuration
 
