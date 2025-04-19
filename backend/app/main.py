@@ -61,11 +61,11 @@ async def task_websocket(websocket: WebSocket, task_id: str):
             await websocket.send_json(data)
 
         async def close_callback():
-            task_manager.remove_task(task_id)
+            await task_manager.remove_task(task_id)
             await websocket.close()
 
         await optimizer.evolve(task_id, update_callback, close_callback)
     except Exception as e:
         logger.info(e)
-        task_manager.remove_task(task_id)
+        await task_manager.remove_task(task_id)
         await websocket.close(code=1011)

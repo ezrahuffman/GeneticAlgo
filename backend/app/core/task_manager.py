@@ -5,11 +5,12 @@ import uuid
 from .optimizer import GeneticOptimizer
 
 class TaskManager:
+
     def __init__(self):
         self.active_tasks: Dict[str, GeneticOptimizer] = {}
         self.task_results: Dict[str, list] = {}
         self.task_metadata: Dict[str, dict] = {}
-        self.max_tasks = 5
+        self.max_tasks = 10
         self._cleanup_lock = asyncio.Lock()
     
     async def create_task(self, config: dict) -> str:
@@ -39,7 +40,7 @@ class TaskManager:
 
         for task_id, metadata in self.task_metadata.items():
             # remove tasks older than one hour 
-            #TODO: this seems like a long time to wait for tasks
+            #TODO: this seems like a long time to wait for tasks, but tasks are removed when they finish 
             if (current_time - metadata['created_at']).total_seconds() > 3600:
                 tasks_to_remove.append(task_id)
         
@@ -49,6 +50,7 @@ class TaskManager:
             self.task_metadata.pop(task_id, None)
 
     async def remove_task(self, task_id: str) -> None:
+        prevLen = len(self.active_tasks)
         self.active_tasks.pop(task_id, None)
         self.task_results.pop(task_id, None)
         self.task_metadata.pop(task_id, None)
