@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Mesh } from 'three';
+import PlatformerGame from './PlatformerGame';
 
 // A simple rotating cube game object
 function Cube(props :any) {
@@ -77,12 +78,9 @@ export default function GameComponent() {
         
         {gameStatus === 'playing' && (
           <>
-            <Cube position={[-1.5, 0, 0]} onScore={handleScore} />
-            <Cube position={[1.5, 0, 0]} onScore={handleScore} />
+            <PlatformerGame/>
           </>
         )}
-        
-        <OrbitControls />
       </Canvas>
     </div>
   );
