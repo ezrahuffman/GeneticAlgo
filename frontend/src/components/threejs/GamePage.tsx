@@ -1,5 +1,3 @@
-// src/pages/GamePage.jsx
-import React from 'react';
 import GameComponent from './GameComponent';
 
 export default function GamePage() {
