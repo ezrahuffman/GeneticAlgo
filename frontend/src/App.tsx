@@ -1,29 +1,27 @@
-import React from 'react';
-import { OptimizationDashboard } from './components/OptimizationDashboard';
-import './globals.css';
+import React from "react";
+import { Route, Routes } from "react-router";
+import GamePage from "./components/threejs/GamePage";
+import OptimizationDashboard from "./components/OptimizationDashboard";
 
-const App: React.FC = () => {
+
+export default function App() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container flex h-14 items-center">
-          <h1 className="text-xl font-bold">Genetic Algorithm Optimizer</h1>
-        </div>
-      </header>
-      
-      <main className="container py-6">
-        <OptimizationDashboard />
-      </main>
-
-      <footer className="border-t py-6 md:py-0">
-        <div className="container flex h-14 items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Built with React & Python
-          </p>
-        </div>
-      </footer>
-    </div>
+    <Routes>
+      <Route path="/" element={<OptimizationDashboard/>}/>
+      <Route path="/Game" element={<GamePage/>}/>
+    </Routes>
   );
-};
+}
 
-export default App;
+function Home() {
+  return <h2>Home</h2>;
+}
+
+function About() {
+  return <h2>About</h2>;
+}
+
+function Users() {
+  return <h2>Users</h2>;
+}
+
