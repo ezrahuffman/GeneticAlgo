@@ -126,6 +126,7 @@ This project demonstrates several modern web development concepts:
 
 - [X] Hosting (this should be done very soon), so you can access the application without having to launch it locally
 - [ ] Additional optimization problems (function optimization, knapsack problem)
+   - [ ] I am currently working on a threejs game that the Genetic optimizer will solve. 
 - [ ] Performance improvements for larger city sets
 
 ## 🤝 Contact
