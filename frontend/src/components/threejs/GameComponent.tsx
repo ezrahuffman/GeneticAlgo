@@ -53,7 +53,7 @@ export default function GameComponent() {
   };
 
   return (
-    <div className="w-full h-screen relative">
+    <div className="w-full h-screen relative" style={{height:'100vh'}}>
       {gameStatus === 'idle' && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <button 
