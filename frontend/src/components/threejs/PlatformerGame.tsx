@@ -5,24 +5,27 @@ import * as THREE from 'three';
 
 
 interface PlatformProps {position:THREE.Vector3, width: number, height : number };
-
+let  first = true;
 // Player component
-const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {velocity:THREE.Vector3, setPlayerVelocity: Function, onPlayerPositionChange: Function}) => {
+const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange } : {input: number[], onPlayerVelocityChange: Function, onPlayerPositionChange: Function}) => {
   const ref = useRef(null);
   const [isJumping, setIsJumping] = useState(true);
   const [position, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
-  const gravity = 1;
-  const jumpForce = 0;
-  const moveSpeed = .1;
+  const [velocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0 ))
+  const gravity = 10;
+  const jumpForce = 20;
+  const moveSpeed = 5;
 
   useFrame((state, delta) => {
-    //console.log("gravity: " + gravity)
 
     // Apply gravity
-    let newVelocity = velocity;
+    let newVelocity = new THREE.Vector3(velocity.x, velocity.y, velocity.z);
     if (isJumping) {
-      velocity.y -= gravity;
+      newVelocity.y -= gravity;
     }
+
+    newVelocity.x = moveSpeed * input[0];
+    newVelocity.y += jumpForce * input[1];
 
     // Calculate new position based on velocity
     const newPosition = new THREE.Vector3(
@@ -49,18 +52,18 @@ const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {veloc
         newPosition.x < (platform.position.x + (platform.width / 2)) &&
         newPosition.y - .5 > (platform.position.y - (platform.height/2)) &&
         newPosition.y - .5 <= (platform.position.y + (platform.height/2)) &&
-        newVelocity.y < 0
+        velocity.y < 0
       ) {
-        console.log("Hit platform");
+        if (first){
+          console.log("Hit platform");
+          console.log("platform: " + platform.position.x + ", " + (platform.position.y + 0.5));
+          console.log("player: " + newPosition.x + ", " + (newPosition.y - 0.5));
+          first = false;
+        }
         newPosition.y = platform.position.y + platform.height/2 + .5;
         tempJumping = false
         //setIsJumping(false);
         newVelocity.y = 0;
-      }
-      else {
-        console.log("player (x, y): (" + newPosition.x + ", " + newPosition.y + ")")
-        console.log("platform.y: " + (platform.position.y))
-        console.log("platform.x: " + (platform.position.x))
       }
     });
 
@@ -72,8 +75,10 @@ const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {veloc
 
     
     setPlayerPosition(newPosition);
-    //setPlayerVelocity(velocity);
+    setPlayerVelocity(newVelocity);
     onPlayerPositionChange(newPosition);
+    onPlayerVelocityChange(newVelocity)
+    //setPlayerVelocity(new THREE.Vector3(0, newVelocity.y, newVelocity.z))
   });
   
   return (
@@ -117,47 +122,71 @@ const platforms : PlatformProps[] = [
 
 // Game component
 const Game = () => {
-  const [playerVelocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0));
+  //let playerVelocity = new THREE.Vector3(0, 0, 0);
+  const [playerVelocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0))
+  const [input, setInput] = useState([0, 0]);
   const [score, setScore] = useState(0);
   const camera = new THREE.OrthographicCamera( 1920 / - 2, 1920 / 2, 1080 / 2, 1080 / - 2, 1, 1000 );
   
+  // Not sure why, but useState was not updating the playerPosition.
+  // My guess is it has something to do with how components are rendered in Threejs
   const [playerPosition, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
+  //let playerPosition = new THREE.Vector3(0, 0, 0);
+
+  const callSetPlayerVelocity = (newVel:THREE.Vector3) =>  {
+    //console.log("newVel: " + newVel.x + ", " + newVel.y + ", ", newVel.z)
+    setPlayerVelocity(new THREE.Vector3(newVel.x, newVel.y, newVel.z));
+  }
 
   // Input handling
   useEffect(() => {
-    // TODO: none of this is changing the velocity used by the player or the movement speed
     const handleKeyDown = (e :any) => {
+      let input = [0, 0];
       switch (e.key) {
         case 'ArrowLeft':
         case 'a':
-          //console.log("left")
-          //console.log("before: " + playerVelocity.x)
-          setPlayerVelocity(prev => new THREE.Vector3(prev.x - 0.15, prev.y, prev.z));
-          //.log("after: " + playerVelocity.x)
+          //setPlayerVelocity(prev => new THREE.Vector3(-5, prev.y, prev.z));
+          input[0] += -1;
           break;
         case 'ArrowRight':
         case 'd':
-          setPlayerVelocity(prev => new THREE.Vector3(prev.x + 0.15, prev.y, prev.z));
+          //setPlayerVelocity(prev => new THREE.Vector3(5, prev.y, prev.z));
+          input[0] += 1;
           break;
         case ' ':
         case 'ArrowUp':
         case 'w':
+          console.log("attempt to jump")
+          let onPlatform = false
+          platforms.forEach(platform => {
+            const widthCond = Math.abs(playerPosition.x - platform.position.x) < platform.width / 2;
+            const heightCond = Math.abs((playerPosition.y - 0.5) - (platform.position.y + 0.5)) < 0.1;
+            console.log("player.y: " + playerPosition.y);
+            if (widthCond && heightCond){
+              onPlatform = true;
+            }
+          })
           if (playerPosition.y <= -3 || 
-              platforms.some(platform => 
-                Math.abs(playerPosition.x - platform.position.x) < platform.width / 2 &&
-                Math.abs(playerPosition.y - (platform.position.y + 0.5)) < 0.1
-              )) {
-            setPlayerVelocity(prev => new THREE.Vector3(prev.x, prev.y + 0.5, prev.z));
+              onPlatform
+            ) {
+            input[1] = 1
+            //setPlayerVelocity(prev => new THREE.Vector3(prev.x, prev.y + 20, prev.z));
+            console.log("jump")
           }
           break;
         default:
           break;
       }
+      setInput(input)
+    };
+    const handleKeyUp = (e: any) => {
+      setInput([0,0]);
     };
 
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp)
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [playerVelocity]);
+  }, [playerVelocity, playerPosition]);
 
   // // Score based on height
   // useEffect(() => {
@@ -165,7 +194,9 @@ const Game = () => {
   //   setScore(newScore);
   // }, [playerPosition.y]);
   const onPlayerPositionChange = (newPos:THREE.Vector3) => {
-    setPlayerPosition(newPos) 
+    //playerPosition = newPos;
+    setPlayerPosition(new THREE.Vector3(newPos.x, newPos.y, newPos.z))
+    console.log("player.y update: " + playerPosition.y)
   }
 
   // Camera follows player
@@ -180,7 +211,7 @@ const Game = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       
-      <Player velocity={playerVelocity} setPlayerVelocity={setPlayerVelocity}  onPlayerPositionChange={onPlayerPositionChange} />
+      <Player input={input} onPlayerVelocityChange={callSetPlayerVelocity}  onPlayerPositionChange={onPlayerPositionChange} />
       
       {platforms.map((platform, index) => (
         <Platform key={index} position={platform.position} width={platform.width} height={1}/>
