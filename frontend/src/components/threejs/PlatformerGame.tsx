@@ -3,6 +3,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
+
+interface PlatformProps {position:THREE.Vector3, width: number, height : number };
+
 // Player component
 const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {velocity:THREE.Vector3, setPlayerVelocity: Function, onPlayerPositionChange: Function}) => {
   const ref = useRef(null);
@@ -11,8 +14,6 @@ const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {veloc
   const gravity = 1;
   const jumpForce = 0;
   const moveSpeed = .1;
-
-  console.log(velocity.x)
 
   useFrame((state, delta) => {
     //console.log("gravity: " + gravity)
@@ -30,32 +31,36 @@ const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {veloc
       position.z
     );
       
-      
-    if (newPosition !== position){
-      console.log("Update Position");
-    }
 
     // Floor collision
-    // if (newPosition.y < -3) {
-    //   newPosition.y = -3;
-    //   setIsJumping(false);
-    //   newVelocity.y = 0;
-    // }
+    // TODO: This should be the condition for a game over
+    if (newPosition.y < -3) {
+      newPosition.y = -3;
+      setIsJumping(false);
+      newVelocity.y = 0;
+    }
 
     let tempJumping = true
     // Platform collisions
     platforms.forEach(platform => {
       if (
-        newPosition.x > platform.position.x - platform.width / 2 &&
-        newPosition.x < platform.position.x + platform.width / 2 &&
-        position.y > platform.position.y &&
-        newPosition.x <= platform.position.y + 0.5 &&
+        
+        newPosition.x > (platform.position.x - (platform.width / 2)) &&
+        newPosition.x < (platform.position.x + (platform.width / 2)) &&
+        newPosition.y - .5 > (platform.position.y - (platform.height/2)) &&
+        newPosition.y - .5 <= (platform.position.y + (platform.height/2)) &&
         newVelocity.y < 0
       ) {
-        newPosition.y = platform.position.y + 0.5;
+        console.log("Hit platform");
+        newPosition.y = platform.position.y + platform.height/2 + .5;
         tempJumping = false
         //setIsJumping(false);
         newVelocity.y = 0;
+      }
+      else {
+        console.log("player (x, y): (" + newPosition.x + ", " + newPosition.y + ")")
+        console.log("platform.y: " + (platform.position.y))
+        console.log("platform.x: " + (platform.position.x))
       }
     });
 
@@ -70,7 +75,7 @@ const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {veloc
     //setPlayerVelocity(velocity);
     onPlayerPositionChange(newPosition);
   });
-  console.log("pos: " + position.x)
+  
   return (
     <mesh ref={ref} position={position}>
       
@@ -81,10 +86,10 @@ const Player = ({ velocity, setPlayerVelocity, onPlayerPositionChange } : {veloc
 };
 
 // Platform component
-const Platform = ({ position, width = 3, height = 1 }: {position:THREE.Vector3, width: number, height : number }) => {
+const Platform = ({ position, width = 3, height = 1 } : PlatformProps) => {
   return (
     <mesh position={position}>
-      <boxGeometry args={[width, height, 1]} />
+      <boxGeometry args={[width, height, height]} />
       <meshStandardMaterial color="limegreen" />
     </mesh>
   );
@@ -101,13 +106,13 @@ const Floor = () => {
 };
 
 // Platform definitions
-const platforms = [
-  { position: new THREE.Vector3(0, -2, 0), width: 5 },
-  { position: new THREE.Vector3(-5, 0, 0), width: 3 },
-  { position: new THREE.Vector3(5, 0, 0), width: 3 },
-  { position: new THREE.Vector3(0, 2, 0), width: 2 },
-  { position: new THREE.Vector3(-7, 3, 0), width: 2 },
-  { position: new THREE.Vector3(7, 3, 0), width: 2 },
+const platforms : PlatformProps[] = [
+  { position: new THREE.Vector3(0, -2, 0), width: 5, height: 1},
+  { position: new THREE.Vector3(-5, 0, 0), width: 3, height: 1 },
+  { position: new THREE.Vector3(5, 0, 0), width: 3, height: 1 },
+  { position: new THREE.Vector3(0, 2, 0), width: 2, height: 1 },
+  { position: new THREE.Vector3(-7, 3, 0), width: 2, height: 1 },
+  { position: new THREE.Vector3(7, 3, 0), width: 2, height: 1 },
 ];
 
 // Game component
@@ -125,7 +130,7 @@ const Game = () => {
       switch (e.key) {
         case 'ArrowLeft':
         case 'a':
-          console.log("left")
+          //console.log("left")
           //console.log("before: " + playerVelocity.x)
           setPlayerVelocity(prev => new THREE.Vector3(prev.x - 0.15, prev.y, prev.z));
           //.log("after: " + playerVelocity.x)
