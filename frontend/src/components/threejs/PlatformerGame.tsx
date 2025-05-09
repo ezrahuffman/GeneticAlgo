@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text } from '@react-three/drei';
+import { OrbitControls, Text, useCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
 
@@ -34,7 +34,7 @@ const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJ
     newVelocity.x = moveSpeed * horizontalInput;
     if (input[2] === 1){
       newVelocity.y = jumpForce;
-      console.log("actually jump")
+      //console.log("actually jump")
       resetJumpInput()
     }
 
@@ -66,15 +66,15 @@ const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJ
         velocity.y <= 0
       ) {
         if (first){
-          console.log("Hit platform");
-          console.log("platform: " + platform.position.x + ", " + (platform.position.y + 0.5));
-          console.log("player: " + newPosition.x + ", " + (newPosition.y - 0.5));
+          // console.log("Hit platform");
+          // console.log("platform: " + platform.position.x + ", " + (platform.position.y + 0.5));
+          // console.log("player: " + newPosition.x + ", " + (newPosition.y - 0.5));
           first = false;
         }
         else{
-          console.log("still on platform")
-          console.log("position: " + position.x + ", " + position.y);
-          console.log("newPosition: " + newPosition.x + ", " + newPosition.y);
+          // console.log("still on platform")
+          // console.log("position: " + position.x + ", " + position.y);
+          // console.log("newPosition: " + newPosition.x + ", " + newPosition.y);
         }
         newPosition.y = platform.position.y + platform.height/2 + .5;
         tempJumping = false
@@ -142,7 +142,9 @@ const Game = () => {
   const [playerVelocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0))
   const [input, setInput] = useState([0, 0, 0]);
   const [score, setScore] = useState(0);
-  const camera = new THREE.OrthographicCamera( 1920 / - 2, 1920 / 2, 1080 / 2, 1080 / - 2, 1, 1000 );
+  //const camera = new THREE.OrthographicCamera( 1920 / - 2, 1920 / 2, 1080 / 2, 1080 / - 2, 1, 1000 );
+  const camera = useThree((state)=>state.camera)
+  camera.position.set(0, 0, 30)
   
   // Not sure why, but useState was not updating the playerPosition.
   // My guess is it has something to do with how components are rendered in Threejs
@@ -174,7 +176,7 @@ const Game = () => {
         case ' ':
         case 'ArrowUp':
         case 'w':
-          console.log("attempt to jump")
+          //console.log("attempt to jump")
           let onPlatform = false
           platforms.forEach(platform => {
             const widthCond = Math.abs(playerPosition.x - platform.position.x) < platform.width / 2;
@@ -190,7 +192,7 @@ const Game = () => {
             //input[2] = 1
             setInput(prev => [prev[0], prev[1], 1])
             //setPlayerVelocity(prev => new THREE.Vector3(prev.x, prev.y + 20, prev.z));
-            console.log("jump")
+            //console.log("jump")
           }
           break;
         default:
@@ -243,9 +245,14 @@ const Game = () => {
 
   // Camera follows player
   useEffect(() => {
-    camera.position.x = playerPosition.x;
-    camera.position.y = playerPosition.y + 2;
-    camera.position.z = playerPosition.z -10;
+    console.log(`follow player: {${playerPosition.x}, ${playerPosition.y}, ${playerPosition.z}}`);
+    // camera.position.x = playerPosition.x;
+    // camera.position.y = playerPosition.y + 2;
+    // camera.position.z = playerPosition.z -10;
+    // camera.position.set(playerPosition.x, playerPosition.y, playerPosition.z - 30)
+    // camera.rotation.set(0, 0, 0);
+    // camera.lookAt(playerPosition);
+    
   }, [playerPosition, camera]);
   
   return (
