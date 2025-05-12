@@ -4,20 +4,25 @@ import { OrbitControls, Text, useCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
 
-interface PlatformProps {position:THREE.Vector3, width: number, height : number };
+interface PlatformProps {position:THREE.Vector3, width: number, height : number, winning?: boolean };
 let  first = true;
 // Player component
-const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJumpInput } : {input: number[], onPlayerVelocityChange: Function, onPlayerPositionChange: Function, resetJumpInput: Function}) => {
+const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJumpInput, onPlayerWin } : {input: number[], onPlayerVelocityChange: Function, onPlayerPositionChange: Function, resetJumpInput: Function, onPlayerWin: Function}) => {
   const ref = useRef(null);
   const [isJumping, setIsJumping] = useState(true);
   const [position, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
   const [velocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0 ))
+  const [timeScale, setTimeScale] = useState(1);
   const gravity = 1;
-  const jumpForce = 40;
+  const jumpForce = 25;
   const moveSpeed = 5;
 
   useFrame((state, delta) => {
+    if(timeScale == 0){
+      return;
+    }
 
+    delta = delta * timeScale;
     // Apply gravity
     let newVelocity = new THREE.Vector3(velocity.x, velocity.y, velocity.z);
     if (isJumping) {
@@ -65,16 +70,9 @@ const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJ
         newPosition.y - .5 <= (platform.position.y + (platform.height/2)) &&
         velocity.y <= 0
       ) {
-        if (first){
-          // console.log("Hit platform");
-          // console.log("platform: " + platform.position.x + ", " + (platform.position.y + 0.5));
-          // console.log("player: " + newPosition.x + ", " + (newPosition.y - 0.5));
-          first = false;
-        }
-        else{
-          // console.log("still on platform")
-          // console.log("position: " + position.x + ", " + position.y);
-          // console.log("newPosition: " + newPosition.x + ", " + newPosition.y);
+        if (platform.winning){
+          setTimeScale(0);
+          onPlayerWin();
         }
         newPosition.y = platform.position.y + platform.height/2 + .5;
         tempJumping = false
@@ -107,11 +105,11 @@ const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJ
 };
 
 // Platform component
-const Platform = ({ position, width = 3, height = 1 } : PlatformProps) => {
+const Platform = ({ position, width = 3, height = 1, winning = false} : PlatformProps) => {
   return (
     <mesh position={position}>
       <boxGeometry args={[width, height, height]} />
-      <meshStandardMaterial color="limegreen" />
+      <meshStandardMaterial color={winning? "royalblue" : "limegreen"} />
     </mesh>
   );
 };
@@ -128,7 +126,9 @@ const Floor = () => {
 
 // Platform definitions
 const platforms : PlatformProps[] = [
+  { position: new THREE.Vector3(1, 8, 0), width: 3, height: 1, winning: true},
   { position: new THREE.Vector3(0, -2, 0), width: 5, height: 1},
+  { position: new THREE.Vector3(-3, 5, 0), width: 2, height: 1},
   { position: new THREE.Vector3(-5, 0, 0), width: 3, height: 1 },
   { position: new THREE.Vector3(5, 0, 0), width: 3, height: 1 },
   { position: new THREE.Vector3(0, 2, 0), width: 2, height: 1 },
@@ -142,18 +142,19 @@ const Game = () => {
   const [playerVelocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0))
   const [input, setInput] = useState([0, 0, 0]);
   const [score, setScore] = useState(0);
-  //const camera = new THREE.OrthographicCamera( 1920 / - 2, 1920 / 2, 1080 / 2, 1080 / - 2, 1, 1000 );
-  const camera = useThree((state)=>state.camera)
-  camera.position.set(0, 0, 30)
+  const camera = useThree((state)=>state.camera);
+  camera.position.set(0, 0, 30);
   
-  // Not sure why, but useState was not updating the playerPosition.
-  // My guess is it has something to do with how components are rendered in Threejs
+  
   const [playerPosition, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
-  //let playerPosition = new THREE.Vector3(0, 0, 0);
 
   const callSetPlayerVelocity = (newVel:THREE.Vector3) =>  {
     //console.log("newVel: " + newVel.x + ", " + newVel.y + ", ", newVel.z)
     setPlayerVelocity(new THREE.Vector3(newVel.x, newVel.y, newVel.z));
+  }
+
+  const onPlayerWin = () => {
+    alert("end game")
   }
 
   // Input handling
@@ -260,10 +261,10 @@ const Game = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       
-      <Player input={input} onPlayerVelocityChange={callSetPlayerVelocity}  onPlayerPositionChange={onPlayerPositionChange} resetJumpInput={resetJumpInput} />
+      <Player input={input} onPlayerVelocityChange={callSetPlayerVelocity}  onPlayerPositionChange={onPlayerPositionChange} resetJumpInput={resetJumpInput} onPlayerWin={onPlayerWin}/>
       
       {platforms.map((platform, index) => (
-        <Platform key={index} position={platform.position} width={platform.width} height={1}/>
+        <Platform key={index} position={platform.position} width={platform.width} height={1} winning={platform.winning}/>
       ))}
       
       <Floor />
