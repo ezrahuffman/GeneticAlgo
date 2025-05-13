@@ -1,13 +1,12 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, useCamera } from '@react-three/drei';
+import { useRef, useState, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 
 interface PlatformProps {position:THREE.Vector3, width: number, height : number, winning?: boolean };
-let  first = true;
 // Player component
-const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJumpInput, onPlayerWin } : {input: number[], onPlayerVelocityChange: Function, onPlayerPositionChange: Function, resetJumpInput: Function, onPlayerWin: Function}) => {
+const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJumpInput, onPlayerWin, onTimeUpdate, gameOver } : {input: number[], onPlayerVelocityChange: Function, onPlayerPositionChange: Function, resetJumpInput: Function, onPlayerWin: Function, onTimeUpdate:Function, gameOver: boolean}) => {
   const ref = useRef(null);
   const [isJumping, setIsJumping] = useState(true);
   const [position, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
@@ -18,9 +17,11 @@ const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJ
   const moveSpeed = 5;
 
   useFrame((state, delta) => {
-    if(timeScale == 0){
+    if(gameOver){
       return;
     }
+
+    onTimeUpdate(delta)
 
     delta = delta * timeScale;
     // Apply gravity
@@ -52,7 +53,7 @@ const Player = ({  input, onPlayerVelocityChange, onPlayerPositionChange, resetJ
       
 
     // Floor collision
-    // TODO: This should be the condition for a game over
+    // TODO: Should be the condition for a game over?
     if (newPosition.y < -3) {
       newPosition.y = -3;
       setIsJumping(false);
@@ -135,13 +136,13 @@ const platforms : PlatformProps[] = [
   { position: new THREE.Vector3(-7, 3, 0), width: 2, height: 1 },
   { position: new THREE.Vector3(7, 3, 0), width: 2, height: 1 },
 ];
-
+let set = false
 // Game component
 const Game = () => {
-  //let playerVelocity = new THREE.Vector3(0, 0, 0);
   const [playerVelocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0))
   const [input, setInput] = useState([0, 0, 0]);
   const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
   const camera = useThree((state)=>state.camera);
   camera.position.set(0, 0, 30);
   
@@ -149,119 +150,116 @@ const Game = () => {
   const [playerPosition, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
 
   const callSetPlayerVelocity = (newVel:THREE.Vector3) =>  {
-    //console.log("newVel: " + newVel.x + ", " + newVel.y + ", ", newVel.z)
     setPlayerVelocity(new THREE.Vector3(newVel.x, newVel.y, newVel.z));
   }
 
   const onPlayerWin = () => {
-    alert("end game")
+    handleInputUp(inputs[inputIndex].control);
+    GameOver(true);
   }
 
+  const GameOver = (won:boolean) => {
+    if (won){
+      alert("Game Over, You Won");
+    }
+    else{
+      alert("Game Over, Loser");
+    }
+    setGameOver(true)
+  }
+
+  type customInput = {
+    control:string,
+    time:number,
+  }
+  const inputs: customInput[] = [{control:"left", time:1},{control:"jump", time:1},{control:"right",time: 0.25}, {control:"jump",time:0.1}, {control:"default", time:2}]
+
   // Input handling
-  useEffect(() => {
-    const handleKeyDown = (e :any) => {
-      let input = [0, 0, 0];
-      switch (e.key) {
-        case 'ArrowLeft':
-        case 'a':
-          //setPlayerVelocity(prev => new THREE.Vector3(-5, prev.y, prev.z));
-          input[0] = 1;
-          setInput(prev => [1, prev[1], prev[2]])
-          break;
-        case 'ArrowRight':
-        case 'd':
-          //setPlayerVelocity(prev => new THREE.Vector3(5, prev.y, prev.z));
-          //input[1] = 1;
-          setInput(prev => [prev[0], 1, prev[2]])
-          break;
-        case ' ':
-        case 'ArrowUp':
-        case 'w':
-          //console.log("attempt to jump")
-          let onPlatform = false
-          platforms.forEach(platform => {
-            const widthCond = Math.abs(playerPosition.x - platform.position.x) < platform.width / 2;
-            const heightCond = Math.abs((playerPosition.y - 0.5) - (platform.position.y + 0.5)) < 0.1;
-            //console.log("player.y: " + playerPosition.y);
-            if (widthCond && heightCond){
-              onPlatform = true;
-            }
-          })
-          if (playerPosition.y <= -3 || 
-              onPlatform
-            ) {
-            //input[2] = 1
-            setInput(prev => [prev[0], prev[1], 1])
-            //setPlayerVelocity(prev => new THREE.Vector3(prev.x, prev.y + 20, prev.z));
-            //console.log("jump")
+  
+  const handleInputDown = (inputString :string) => {
+    switch (inputString) {
+      case 'left':
+        input[0] = 1;
+        setInput(prev => [1, prev[1], prev[2]])
+        break;
+      case 'right':
+        setInput(prev => [prev[0], 1, prev[2]])
+        break;
+      case 'jump':
+        let onPlatform = false
+        platforms.forEach(platform => {
+          const widthCond = Math.abs(playerPosition.x - platform.position.x) < platform.width / 2;
+          const heightCond = Math.abs((playerPosition.y - 0.5) - (platform.position.y + 0.5)) < 0.1;
+          //console.log("player.y: " + playerPosition.y);
+          if (widthCond && heightCond){
+            onPlatform = true;
           }
-          break;
-        default:
-          break;
+        })
+        if (playerPosition.y <= -3 || 
+          onPlatform
+        ) {
+          setInput(prev => [prev[0], prev[1], 1])
+        }
+        break;
+      default:
+        break;
       }
-      //setInput(input)
     };
-    const handleKeyUp = (e: any) => {
-      switch (e.key) {
-        case 'ArrowLeft':
-        case 'a':
-          //setPlayerVelocity(prev => new THREE.Vector3(-5, prev.y, prev.z));
-          setInput(prev => [0, prev[1], prev[2]])
-          break;
-        case 'ArrowRight':
-        case 'd':
-          //setPlayerVelocity(prev => new THREE.Vector3(5, prev.y, prev.z));
+  const handleInputUp = (inputString: string) => {
+    switch (inputString) {
+      case 'left':
+        setInput(prev => [0, prev[1], prev[2]])
+        break;
+        case 'right':
           setInput(prev => [prev[0], 0, prev[2]])
           break;
-        case ' ':
-        case 'ArrowUp':
-        case 'w':
-          //setInput(prev => [prev[0], prev[1], 0])
-          break;
-        default:
-          break;
+          case 'jump':
+            break;
+            default:
+              break;
+            }
+          };
+  const [realTime, setRealTime] = useState(0);
+  const [totalTime, setTotalTime] = useState(inputs[0].time);
+  const [inputIndex, setInputIndex] = useState(0);
+  const onTimeUpdate = (delta:number) => {
+    if (!set){
+      handleInputDown(inputs[0].control)
+      set = true
+    }
+    setRealTime(prev => prev + delta);
+    if (realTime > totalTime){
+      if (inputIndex === inputs.length - 1){
+        GameOver(false);
       }
-      //setInput(prev => [input[0], prev[1]]);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp)
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [playerVelocity, playerPosition]);
-
+      else{
+        setInputIndex(prev => prev + 1)
+        setTotalTime(prev => prev + inputs[inputIndex].time)
+        handleInputUp(inputs[inputIndex].control)
+        handleInputDown(inputs[inputIndex+1].control)
+      }
+    }
+  }
+                  
   // // Score based on height
   // useEffect(() => {
   //   const newScore = Math.max(0, Math.floor((playerPosition.y + 3) * 10));
   //   setScore(newScore);
   // }, [playerPosition.y]);
   const onPlayerPositionChange = (newPos:THREE.Vector3) => {
-    //playerPosition = newPos;
     setPlayerPosition(new THREE.Vector3(newPos.x, newPos.y, newPos.z))
-    //console.log("player.y update: " + playerPosition.y)
   }
 
   const resetJumpInput = () =>{
     setInput(prev => [prev[0], prev[1], 0]);
   }
-
-  // Camera follows player
-  useEffect(() => {
-    console.log(`follow player: {${playerPosition.x}, ${playerPosition.y}, ${playerPosition.z}}`);
-    // camera.position.x = playerPosition.x;
-    // camera.position.y = playerPosition.y + 2;
-    // camera.position.z = playerPosition.z -10;
-    // camera.position.set(playerPosition.x, playerPosition.y, playerPosition.z - 30)
-    // camera.rotation.set(0, 0, 0);
-    // camera.lookAt(playerPosition);
-    
-  }, [playerPosition, camera]);
   
   return (
     <>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       
-      <Player input={input} onPlayerVelocityChange={callSetPlayerVelocity}  onPlayerPositionChange={onPlayerPositionChange} resetJumpInput={resetJumpInput} onPlayerWin={onPlayerWin}/>
+      <Player input={input} onPlayerVelocityChange={callSetPlayerVelocity}  onPlayerPositionChange={onPlayerPositionChange} resetJumpInput={resetJumpInput} onPlayerWin={onPlayerWin} onTimeUpdate={onTimeUpdate} gameOver = {gameOver}/>
       
       {platforms.map((platform, index) => (
         <Platform key={index} position={platform.position} width={platform.width} height={1} winning={platform.winning}/>
