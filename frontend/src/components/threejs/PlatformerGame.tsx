@@ -158,6 +158,7 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
 
 
   useEffect(()=>{
+    console.log(evolutionData)
     let test :number[] = [];
     for (let index = 0; index < evolutionData.length; index++){
       test[index] = 0;
@@ -196,7 +197,7 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       test_2[index] = 0;
     }
     setScores(test_2);
-  }, []);
+  }, [evolutionData]);
 
   const playerDone = (index:number, won:Boolean) => {
     const winBonus = won ? winBonusAmount : 0;
@@ -380,8 +381,13 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
 const PlatformerGame = ({onGameOverCallback, evolutionData}:{onGameOverCallback:Function, evolutionData: MoveData[][]}) => {
   return (
       <>
+      {evolutionData && (
+        <>
       <Game onGameOverCallBack={onGameOverCallback} evolutionData={evolutionData}/>
       <OrbitControls enableRotate={false} enableZoom={false} />
+      </>
+      )
+      }
       </>
   );
 };
