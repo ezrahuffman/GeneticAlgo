@@ -4,8 +4,9 @@ from enum import Enum
 
 class ProblemType(str, Enum):
     TSP = "tsp"
-    FUNCTION_OPTIMIZATION = "function_optimization"
-    KNAPSACK = "knapsack"
+    GPA = "GPA"
+    #FUNCTION_OPTIMIZATION = "function_optimization"
+    #KNAPSACK = "knapsack"
 
 class OptimizationRequest(BaseModel):
     problem_type: ProblemType

@@ -22,6 +22,7 @@ class TaskManager:
                 raise ValueError("Maximum concurrent tasks reached")
             
             task_id = str(uuid.uuid4())
+            config['task_id'] = task_id
             optimizer = GeneticOptimizer(config)
 
             self.active_tasks[task_id] = optimizer

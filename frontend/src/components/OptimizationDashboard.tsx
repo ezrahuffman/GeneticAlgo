@@ -226,6 +226,7 @@ export const OptimizationDashboard: React.FC = () => {
             <OptimizationForm 
               onSubmit={startNewTask}
               isRunning={isRunning}
+              problemType='tsp'
             />
           </div>
 

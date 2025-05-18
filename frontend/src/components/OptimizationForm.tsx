@@ -32,7 +32,7 @@ interface City extends Array<number> {
   }
   
   interface OptimizationFormData {
-    problem_type: 'tsp';
+    problem_type: string;
     population_size: number;
     dimension: number;
     mutation_rate: number;
@@ -46,12 +46,13 @@ interface City extends Array<number> {
   interface OptimizationFormProps {
     onSubmit: (data: OptimizationFormData) => void;
     isRunning: boolean;
+    problemType: string;
   }
   
-  const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning }) => {
+  const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning, problemType }) => {
     const form = useForm<OptimizationFormData>({
       defaultValues: {
-        problem_type: 'tsp',
+        problem_type: problemType,
         population_size: 50,
         dimension: 5,
         mutation_rate: 0.5,
@@ -181,7 +182,7 @@ interface City extends Array<number> {
                   )}
                 />
   
-                <FormItem>
+                {problemType !== "GPA" ? <FormItem>
                   <FormLabel>Cities</FormLabel>
                   <div className="border rounded-md">
                     <Table>
@@ -238,7 +239,7 @@ interface City extends Array<number> {
                     <Plus className="h-4 w-4 mr-2" />
                     Add City
                   </Button>
-                </FormItem>
+                </FormItem>: <div/>}
               </div>
   
               <Button 
