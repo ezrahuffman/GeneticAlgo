@@ -54,7 +54,7 @@ interface City extends Array<number> {
       defaultValues: {
         problem_type: problemType,
         population_size: 10,
-        dimension: 20,
+        dimension: 5,
         mutation_rate: 0.1,
         crossover_rate: 0.5,
         max_generations: 10,

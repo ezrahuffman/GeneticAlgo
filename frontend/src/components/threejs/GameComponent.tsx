@@ -105,6 +105,7 @@ export default function GameComponent() {
         //     new Error(`Evaluation timed out after ${timeoutMs}ms. evaluateGPA was never called`)
         //   );
         // }
+        console.log("timedout")
         setSingleOperation(null);
       }, timeoutMs)
       console.log("set single operation")

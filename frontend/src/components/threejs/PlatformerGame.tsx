@@ -59,6 +59,7 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
   const [reset, setReset] = useState<boolean[]>([]);
   const [realTime, setRealTime] = useState(0);
   const [playerIsJumpings, setPlayerIsJumpings] = useState<boolean[]>([])
+  let pDone = 0;
   
   
   const [playerPositions, setPlayerPositions] = useState<THREE.Vector3[]>([])
@@ -150,12 +151,14 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     const newPlayer= players[index] === 0
     if (players[index] === 0){
       setPlayersDone(prev => prev + 1);
+      pDone += 1;
       let temp = players;
       temp[index] = won? 2: 1;
       setPlayers(temp);
       //console.log(`players done: ${playersDone}`)
     }
-    if (newPlayer && playersDone + 1 === evolutionData.length && !gameOver){
+    console.log(`players done: ${pDone}`)
+    if (pDone >= evolutionData.length && !gameOver){
       GameOver();
     }
   }
@@ -248,16 +251,18 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
   //const [inputIndex, setInputIndex] = useState(0);
   const onTimeUpdate = (index:number, delta:number) => {
     if (moves.length < 1){
+      
       return;
     }
     const totalTime = totalTimes[index];
     const inputIndex = inputIndices[index];
+    console.log(`set ${set}, realTime ${realTime}, totalTime ${totalTime}, inputI ${inputIndex}`)
     //console.log(`inputIndex ${inputIndex}, ${moves[index][0]}`)
     if (!set){
       handleInputDown(index, moves[index][0].action)
       set = true
     }
-    setRealTime(prev => prev + delta);
+    
     if (realTime > totalTime){
       if (inputIndex === moves[0].length - 1){
         //Out of moves, game over
@@ -318,10 +323,12 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
   }
 
   useFrame((state, delta) => {
-    console.log("useFrame")
+    //console.log("useFrame")
     if (gameOver){
       return;
     }
+    setRealTime(prev => prev + delta);
+    //console.log(`Realtime: ${realTime}`)
     for(let index = 0; index < evolutionData.length; index++){
       const input = inputs[index]
       let position = playerPositions[index];
