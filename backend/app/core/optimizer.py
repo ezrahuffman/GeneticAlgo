@@ -14,7 +14,7 @@ class GeneticOptimizer:
     def __init__(self, config: dict):
         self.population_size = min(100, config.get('population_size', 50))
         self.mutation_rate = config.get('mutation_rate', 0.1)
-        self.crossover_rate = config.get('crosover_rate', 0.8)
+        self.crossover_rate = config.get('crossover_rate', 0.8)
         self.problem_type = config.get('problem_type', 'tsp')
         self.dimension = config.get('dimension', 20)
         self.generation = 0
@@ -198,9 +198,10 @@ class GeneticOptimizer:
         if self.problem_type == "GPA":
             dt = np.dtype([('action', '<U5'), ('duration', '<f8')])
             offspring = np.empty((self.population_size, self.dimension), dtype=dt)
-        
+        logger.info(f"crossover rate: {self.crossover_rate}")
         for i in range(self.population_size):
             if np.random.random() < self.crossover_rate:
+                logger.error("Crossover")
                 if self.problem_type == 'tsp' or self.problem_type == 'GPA':
                     # Order crossover for TSP
                     # Select two random crossover points
@@ -294,7 +295,7 @@ class GeneticOptimizer:
         # use selection, mutation, and crossover to create next generation
         parents1, parents2 = self._select_parents(fitness)
         logger.info("before crossover")
-        #offspring = self._crossover(parents1, parents2)
+        offspring = self._crossover(parents1, parents2)
         logger.info("after crossover")
         offspring = parents1
         self.population = self._mutate(offspring) 
