@@ -188,7 +188,20 @@ class GeneticOptimizer:
             #canidates = np.random.choice(self.population_size, tournament_size)
             canidates = list(range(self.population_size))
             parent2_idx[i] = canidates[np.argmax(fitness[canidates])]
+        # same = True
         
+        # test_lst = self.population[parent1_idx][0]
+        # for lst in self.population[parent1_idx]:
+        #     fail = False
+        #     for k in range(len(lst)):
+        #         if (test_lst[k] != lst[k]):
+        #             same = False
+        #             logger.info(f"mismatch: {test_lst} != {lst}")
+        #             break
+        #     if fail:
+        #         break
+        # if same:
+        #     logger.info("all match")
         logger.info(f"self.population[parent1_idx].shape {self.population[parent1_idx].shape}")
         return self.population[parent1_idx], self.population[parent2_idx]
 
@@ -295,10 +308,24 @@ class GeneticOptimizer:
         # use selection, mutation, and crossover to create next generation
         parents1, parents2 = self._select_parents(fitness)
         logger.info("before crossover")
-        offspring = self._crossover(parents1, parents2)
+        #offspring = self._crossover(parents1, parents2)
         logger.info("after crossover")
         offspring = parents1
         self.population = self._mutate(offspring) 
+        same = True
+        
+        test_lst = self.population[0]
+        for lst in self.population:
+            fail = False
+            for k in range(len(lst)):
+                if (test_lst[k] != lst[k]):
+                    same = False
+                    logger.info(f"mismatch: {test_lst} != {lst}")
+                    break
+            if fail:
+                break
+        if same:
+            logger.info("all match")
         logger.info("after mutate")          
 
 

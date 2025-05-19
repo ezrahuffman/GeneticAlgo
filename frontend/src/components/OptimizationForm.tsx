@@ -53,11 +53,11 @@ interface City extends Array<number> {
     const form = useForm<OptimizationFormData>({
       defaultValues: {
         problem_type: problemType,
-        population_size: 50,
-        dimension: 15,
+        population_size: 10,
+        dimension: 20,
         mutation_rate: 0.0,
         crossover_rate: 0.0,
-        max_generations: 25,
+        max_generations: 10,
         parameters: {
           cities: [
             [0, 0],

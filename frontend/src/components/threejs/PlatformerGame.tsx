@@ -2,127 +2,13 @@ import { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
+import Player from './Player';
 
 let callGameOver = true;
 
 interface PlatformProps {position:THREE.Vector3, width: number, height : number, winning?: boolean };
 type MoveData = {action:string, duration:number};
-interface PlayerProps {index:number, input: number[], reset:boolean, setReset:Function, onPlayerPositionChange: Function, resetJumpInput: Function, onPlayerWin: Function, onTimeUpdate:Function, gameOver: boolean, onPlayerDone:Function};
-// Player component
-const Player = ({  index, input, reset, setReset, onPlayerPositionChange, resetJumpInput, onPlayerWin, onPlayerDone, onTimeUpdate, gameOver } : PlayerProps) => {
-  const ref = useRef(null);
-  const [isJumping, setIsJumping] = useState(true);
-  const [position, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
-  const [velocity, setPlayerVelocity] = useState(new THREE.Vector3(0, 0, 0 ))
-  const [timeScale, setTimeScale] = useState(1);
-  const gravity = 1;
-  const jumpForce = 25;
-  const moveSpeed = 5;
 
-  useFrame((state, delta) => {
-    if(gameOver){
-      onPlayerDone()
-      return;
-    }
-
-    if(reset){
-      setPlayerPosition(new THREE.Vector3(0,0,0))
-      setPlayerVelocity(new THREE.Vector3(0,0,0))
-      setReset(index, false)
-    }
-
-    onTimeUpdate(index, delta)
-
-    delta = delta * timeScale;
-    // Apply gravity
-    let newVelocity = new THREE.Vector3(velocity.x, velocity.y, velocity.z);
-    if(reset){
-      newVelocity = new THREE.Vector3(0, 0, 0);
-    }
-    if (isJumping) {
-      newVelocity.y -= gravity;
-    }
-    
-    let horizontalInput = 0;
-    if (input[0] === 1){
-      horizontalInput += -1;
-    }
-    if (input[1] === 1){
-      horizontalInput += 1;
-    }
-    newVelocity.x = moveSpeed * horizontalInput;
-    if (input[2] === 1 && !isJumping){
-      newVelocity.y = jumpForce;
-      //console.log("actually jump")
-      resetJumpInput(index)
-    }
-
-    // Calculate new position based on velocity
-    let newPosition = new THREE.Vector3(
-      position.x + newVelocity.x * delta,
-      position.y + newVelocity.y * delta,
-      position.z
-    );
-    if (reset){
-      newPosition = new THREE.Vector3(
-        newVelocity.x * delta,
-        newVelocity.y * delta,
-        0
-      );
-    }
-      
-
-    // Floor collision
-    // TODO: Should be the condition for a game over?
-    if (newPosition.y < -3) {
-      newPosition.y = -3;
-      setIsJumping(false);
-      newVelocity.y = 0;
-    }
-
-    let tempJumping = true
-    // Platform collisions
-    platforms.forEach(platform => {
-      if (
-
-        newPosition.x >= (platform.position.x - (platform.width / 2)) &&
-        newPosition.x <= (platform.position.x + (platform.width / 2)) &&
-        newPosition.y - .5 >= (platform.position.y - (platform.height/2)) &&
-        newPosition.y - .5 <= (platform.position.y + (platform.height/2)) &&
-        velocity.y <= 0
-      ) {
-        if (platform.winning){
-          setTimeScale(index);
-          onPlayerWin(index);
-        }
-        newPosition.y = platform.position.y + platform.height/2 + .5;
-        tempJumping = false
-        //setIsJumping(false);
-        newVelocity.y = 0;
-      }
-    });
-
-    setIsJumping(tempJumping)
-
-    // Side boundaries
-    if (newPosition.x < -9) newPosition.x = -9;
-    if (newPosition.x > 9) newPosition.x = 9;
-
-    
-    setPlayerPosition(newPosition);
-    setPlayerVelocity(newVelocity);
-    onPlayerPositionChange(index, newPosition);
-    //setPlayerVelocity(new THREE.Vector3(0, newVelocity.y, newVelocity.z))
-  });
-
-  return (
-    <mesh ref={ref} position={position}>
-      
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="hotpink" />
-    </mesh>
-  );
-};
 
 // Platform component
 const Platform = ({ position, width = 3, height = 1, winning = false} : PlatformProps) => {
@@ -172,9 +58,11 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
   const [playersDone, setPlayersDone] = useState(0)
   const [reset, setReset] = useState<boolean[]>([]);
   const [realTime, setRealTime] = useState(0);
+  const [playerIsJumpings, setPlayerIsJumpings] = useState<boolean[]>([])
   
   
   const [playerPositions, setPlayerPositions] = useState<THREE.Vector3[]>([])
+  const [playerVelocities, setPlayerVelocities] = useState<THREE.Vector3[]>([])
 
 
   useEffect(()=>{
@@ -187,6 +75,11 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       reset_start[index] = true;
     }
     setReset(reset_start)
+    let isJumpingArr :boolean[] = [];
+    for (let index = 0; index < evolutionData.length; index++){
+      isJumpingArr[index] = true;
+    }
+    setPlayerIsJumpings(isJumpingArr)
     setPlayersDone(0);
     console.log(evolutionData)
     let test :number[] = [];
@@ -199,11 +92,17 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       newArr[index] =  new THREE.Vector3(0, 0 , 0);
     }
     setPlayerPositions(newArr)
+    let velArr:THREE.Vector3[] = []
+    for (let index = 0; index < evolutionData.length; index++) {
+      velArr[index] =  new THREE.Vector3(0, 0 , 0);
+    }
+    setPlayerVelocities(velArr)
     let newMoves: MoveData[][] = [];
     for (let index = 0; index < evolutionData.length; index++) {
       newMoves[index] =  evolutionData[index];
     }
     setMoves(newMoves);
+    console.log(newMoves)
     let test_1 :number[] = [];
     for (let index = 0; index < evolutionData.length; index++){
       test_1[index] = 0;
@@ -395,6 +294,18 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     setPlayerPositions(tempArr)
   }
 
+  const onPlayerVelocityChange = (index:number, newVel:THREE.Vector3) => {
+    let tempArr = playerVelocities;
+    tempArr[index] = new THREE.Vector3(newVel.x, newVel.y, newVel.z);
+    setPlayerVelocities(tempArr)
+  }
+
+  const updateIsJumping = (index:number, newVal:boolean) => {
+    let tempArr = playerIsJumpings;
+    tempArr[index] = newVal;
+    setPlayerIsJumpings(tempArr)
+  }
+
   const resetJumpInput = (index:number) =>{
     const prev = inputs[index];
     updateInput(index, [prev[0], prev[1], 0]);
@@ -406,13 +317,123 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     setReset(temp);
   }
 
+  useFrame((state, delta) => {
+    console.log("useFrame")
+    if (gameOver){
+      return;
+    }
+    for(let index = 0; index < evolutionData.length; index++){
+      const input = inputs[index]
+      let position = playerPositions[index];
+      let velocity = playerVelocities[index];
+      let isJumping = playerIsJumpings[index];
+      const timeScale = 1;
+      const gravity = 1;
+      const jumpForce = 25;
+      const moveSpeed = 5;
+
+      if(players[index] !== 0){
+        checkPlayerDone()
+        continue;
+      }
+  
+      if(reset[index]){
+        position = new THREE.Vector3(0,0,0)
+        velocity = new THREE.Vector3(0,0,0)
+        updateReset(index, false)
+      }
+  
+      onTimeUpdate(index, delta)
+  
+      delta = delta * timeScale;
+      // Apply gravity
+      let newVelocity = new THREE.Vector3(velocity.x, velocity.y, velocity.z);
+      if(reset[index]){
+        newVelocity = new THREE.Vector3(0, 0, 0);
+      }
+      if (isJumping) {
+        newVelocity.y -= gravity;
+      }
+      
+      let horizontalInput = 0;
+      if (input[0] === 1){
+        horizontalInput += -1;
+      }
+      if (input[1] === 1){
+        horizontalInput += 1;
+      }
+      newVelocity.x = moveSpeed * horizontalInput;
+      if (input[2] === 1 && !isJumping){
+        newVelocity.y = jumpForce;
+        //console.log("actually jump")
+        resetJumpInput(index)
+      }
+  
+      // Calculate new position based on velocity
+      let newPosition = new THREE.Vector3(
+        position.x + newVelocity.x * delta,
+        position.y + newVelocity.y * delta,
+        position.z
+      );
+      if (reset[index]){
+        newPosition = new THREE.Vector3(
+          newVelocity.x * delta,
+          newVelocity.y * delta,
+          0
+        );
+      }
+        
+  
+      // Floor collision
+      // TODO: Should be the condition for a game over?
+      if (newPosition.y < -3) {
+        newPosition.y = -3;
+        updateIsJumping(index, false);
+        newVelocity.y = 0;
+      }
+  
+      let tempJumping = true
+      // Platform collisions
+      platforms.forEach(platform => {
+        if (
+  
+          newPosition.x >= (platform.position.x - (platform.width / 2)) &&
+          newPosition.x <= (platform.position.x + (platform.width / 2)) &&
+          newPosition.y - .5 >= (platform.position.y - (platform.height/2)) &&
+          newPosition.y - .5 <= (platform.position.y + (platform.height/2)) &&
+          velocity.y <= 0
+        ) {
+          if (platform.winning){
+            //setTimeScale(0); This needs to be updated to use timescale (maybe)
+            onPlayerWin(index);
+          }
+          newPosition.y = platform.position.y + platform.height/2 + .5;
+          tempJumping = false
+          //setIsJumping(false);
+          newVelocity.y = 0;
+        }
+      });
+  
+      updateIsJumping(index, tempJumping)
+  
+      // Side boundaries
+      if (newPosition.x < -9) newPosition.x = -9;
+      if (newPosition.x > 9) newPosition.x = 9;
+  
+      
+      //onPlayerPositionChange(index, newPosition);
+      onPlayerVelocityChange(index, newVelocity);
+      onPlayerPositionChange(index, newPosition);
+    }
+  });
+
   return (
     <>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       {
       players.map((player, index) => (
-        <Player key={index} index={index} input={inputs[index]} reset={reset[index]} setReset={updateReset} onPlayerPositionChange={onPlayerPositionChange} resetJumpInput={resetJumpInput} onPlayerWin={onPlayerWin} onTimeUpdate={onTimeUpdate} gameOver = {players[index] !== 0} onPlayerDone={checkPlayerDone}/>
+        <Player position={playerPositions[index]}/>
       ))}
       
       {platforms.map((platform, index) => (
