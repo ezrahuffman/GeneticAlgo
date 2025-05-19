@@ -69,10 +69,10 @@ async def task_websocket(websocket: WebSocket, task_id: str):
         async def wait_for_frontend():
             recieved = False
             while not recieved:
-                logger.debug("await recieve text from front-end")
+                logger.info("await recieve text from front-end")
                 data = await websocket.receive_text()
                 message = json.loads(data)
-                logger.debug(f"Task {task_id}: Received message from client: {message}")
+                logger.info(f"Task {task_id}: Received message from client: {message}")
                 
                 if message.get("type") == "FITNESS_RESULTS":
                     received_task_id = message.get("taskId")

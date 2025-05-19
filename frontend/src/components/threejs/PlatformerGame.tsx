@@ -3,12 +3,13 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
+let callGameOver = true;
 
 interface PlatformProps {position:THREE.Vector3, width: number, height : number, winning?: boolean };
 type MoveData = {action:string, duration:number};
-interface PlayerProps {index:number, input: number[], onPlayerPositionChange: Function, resetJumpInput: Function, onPlayerWin: Function, onTimeUpdate:Function, gameOver: boolean};
+interface PlayerProps {index:number, input: number[], reset:boolean, setReset:Function, onPlayerPositionChange: Function, resetJumpInput: Function, onPlayerWin: Function, onTimeUpdate:Function, gameOver: boolean, onPlayerDone:Function};
 // Player component
-const Player = ({  index, input, onPlayerPositionChange, resetJumpInput, onPlayerWin, onTimeUpdate, gameOver } : PlayerProps) => {
+const Player = ({  index, input, reset, setReset, onPlayerPositionChange, resetJumpInput, onPlayerWin, onPlayerDone, onTimeUpdate, gameOver } : PlayerProps) => {
   const ref = useRef(null);
   const [isJumping, setIsJumping] = useState(true);
   const [position, setPlayerPosition] = useState(new THREE.Vector3(0, 0, 0))
@@ -20,7 +21,14 @@ const Player = ({  index, input, onPlayerPositionChange, resetJumpInput, onPlaye
 
   useFrame((state, delta) => {
     if(gameOver){
+      onPlayerDone()
       return;
+    }
+
+    if(reset){
+      setPlayerPosition(new THREE.Vector3(0,0,0))
+      setPlayerVelocity(new THREE.Vector3(0,0,0))
+      setReset(index, false)
     }
 
     onTimeUpdate(index, delta)
@@ -28,6 +36,9 @@ const Player = ({  index, input, onPlayerPositionChange, resetJumpInput, onPlaye
     delta = delta * timeScale;
     // Apply gravity
     let newVelocity = new THREE.Vector3(velocity.x, velocity.y, velocity.z);
+    if(reset){
+      newVelocity = new THREE.Vector3(0, 0, 0);
+    }
     if (isJumping) {
       newVelocity.y -= gravity;
     }
@@ -40,18 +51,25 @@ const Player = ({  index, input, onPlayerPositionChange, resetJumpInput, onPlaye
       horizontalInput += 1;
     }
     newVelocity.x = moveSpeed * horizontalInput;
-    if (input[2] === 1){
+    if (input[2] === 1 && !isJumping){
       newVelocity.y = jumpForce;
       //console.log("actually jump")
       resetJumpInput(index)
     }
 
     // Calculate new position based on velocity
-    const newPosition = new THREE.Vector3(
+    let newPosition = new THREE.Vector3(
       position.x + newVelocity.x * delta,
       position.y + newVelocity.y * delta,
       position.z
     );
+    if (reset){
+      newPosition = new THREE.Vector3(
+        newVelocity.x * delta,
+        newVelocity.y * delta,
+        0
+      );
+    }
       
 
     // Floor collision
@@ -152,12 +170,24 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
   const [inputs, setInputs] = useState<number[][]>([])
   const [totalTimes, setTotalTimes] = useState<number[]>([]);
   const [playersDone, setPlayersDone] = useState(0)
+  const [reset, setReset] = useState<boolean[]>([]);
+  const [realTime, setRealTime] = useState(0);
   
   
   const [playerPositions, setPlayerPositions] = useState<THREE.Vector3[]>([])
 
 
   useEffect(()=>{
+    callGameOver = true;
+    console.log("reset")
+    setGameOver(false)
+    setRealTime(0);
+    let reset_start :boolean[] = [];
+    for (let index = 0; index < evolutionData.length; index++){
+      reset_start[index] = true;
+    }
+    setReset(reset_start)
+    setPlayersDone(0);
     console.log(evolutionData)
     let test :number[] = [];
     for (let index = 0; index < evolutionData.length; index++){
@@ -199,22 +229,34 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     setScores(test_2);
   }, [evolutionData]);
 
-  const playerDone = (index:number, won:Boolean) => {
+  const checkPlayerDone = () => {
+    for (let i = 0; i < players.length; i++){
+      if (players[i] === 0){
+        return;
+      }
+    }
+    if (!gameOver){
+      GameOver()
+    }
+    
+  }
+
+  const playerDone = (index:number, won:Boolean, invalidInput = false) => {
     const winBonus = won ? winBonusAmount : 0;
     // floor is at a height of -4 so add 4 to prevent negative scores
-    const playerScore = (playerPositions[index].y + 4) + winBonus;
+    const playerScore = invalidInput? -1000 : ((playerPositions[index].y + 4) * 10) + winBonus;
     let tempArr = scores;
     tempArr[index] = playerScore;
     setScores(tempArr);
-
-    if (players[index] == 0){
+    const newPlayer= players[index] === 0
+    if (players[index] === 0){
       setPlayersDone(prev => prev + 1);
       let temp = players;
-      temp[index] = 1;
+      temp[index] = won? 2: 1;
       setPlayers(temp);
-      console.log(`players done: ${playersDone}`)
+      //console.log(`players done: ${playersDone}`)
     }
-    if (playersDone + 1 === evolutionData.length){
+    if (newPlayer && playersDone + 1 === evolutionData.length && !gameOver){
       GameOver();
     }
   }
@@ -232,10 +274,13 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     // else{
     //   alert("Game Over, Loser");
     // }
-    
-    onGameOverCallBack(scores)
+    if (callGameOver){
+      console.log(`gameOver Callback ${playersDone}`)
+      onGameOverCallBack(scores)
 
-    setGameOver(true)
+      callGameOver = false;
+      setGameOver(true)
+    }
   }
 
   // type customInput = {
@@ -278,6 +323,7 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
         }
         break;
       default:
+        playerDone(index, false, true)
         break;
       }
     };
@@ -292,14 +338,14 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
         break;
       case 'jump':
         break;
-        default:
-          break;
+      default:
+        playerDone(index, false, true)
+        break;
       };
   };
 
   //TODO: this needs to be done for every player, not just once 
   //Realtime can be shared, but totaltime is part of each player
-  const [realTime, setRealTime] = useState(0);
   //const [inputIndex, setInputIndex] = useState(0);
   const onTimeUpdate = (index:number, delta:number) => {
     if (moves.length < 1){
@@ -315,7 +361,7 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     setRealTime(prev => prev + delta);
     if (realTime > totalTime){
       if (inputIndex === moves[0].length - 1){
-        //GameOver(false);
+        //Out of moves, game over
         playerDone(index, false)
       }
       else{
@@ -328,6 +374,11 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
         setTotalTimes(tempArr);
         //setTotalTime(prev => prev + inputs[inputIndex].time)
         handleInputUp(index, moves[index][inputIndex].action)
+        const nextAction = moves[index][inputIndex+1].action;
+        if (nextAction === "pause"){
+          playerDone(index, false);
+          return;
+        }
         handleInputDown(index, moves[index][inputIndex+1].action)
       }
     }
@@ -349,13 +400,19 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     updateInput(index, [prev[0], prev[1], 0]);
   }
   
+  const updateReset = (index:number, val:boolean) => {
+    let temp = reset;
+    temp[index] = val;
+    setReset(temp);
+  }
+
   return (
     <>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       {
       players.map((player, index) => (
-        <Player key={index} index={index} input={inputs[index]} onPlayerPositionChange={onPlayerPositionChange} resetJumpInput={resetJumpInput} onPlayerWin={onPlayerWin} onTimeUpdate={onTimeUpdate} gameOver = {players[index] === 1}/>
+        <Player key={index} index={index} input={inputs[index]} reset={reset[index]} setReset={updateReset} onPlayerPositionChange={onPlayerPositionChange} resetJumpInput={resetJumpInput} onPlayerWin={onPlayerWin} onTimeUpdate={onTimeUpdate} gameOver = {players[index] !== 0} onPlayerDone={checkPlayerDone}/>
       ))}
       
       {platforms.map((platform, index) => (

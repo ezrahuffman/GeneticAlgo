@@ -62,7 +62,7 @@ class GeneticOptimizer:
     def create_game_population(self, population_size):
         action_duration_dtype = np.dtype([('action', 'U5'), ('duration', 'f8')])
         population = np.empty((self.population_size, self.dimension), dtype=action_duration_dtype)
-        possible_actions = np.array(['left', 'right', 'jump', 'pause'])
+        possible_actions = np.array(['left', 'right', 'jump'])# 'pause'])
         for i in range(self.population_size):
             actions = np.random.choice(possible_actions, size=self.dimension)
             durations = np.random.uniform(0.25, 2.0, size=self.dimension)
@@ -173,17 +173,20 @@ class GeneticOptimizer:
 
     def _select_parents(self, fitness: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         # select parents using tournament selection
-        tournament_size = 3
+        tournament_size = self.population_size
         parent1_idx = np.zeros(self.population_size, dtype=int)
         parent2_idx = np.zeros(self.population_size, dtype=int)
 
         for i in range(self.population_size):
             #tournament for parent one
-            canidates = np.random.choice(self.population_size, tournament_size)
+            #canidates = np.random.choice(self.population_size, tournament_size)
+            canidates = list(range(self.population_size))
             parent1_idx[i] = canidates[np.argmax(fitness[canidates])]
+            #logger.info(self.population[parent1_idx[i]] )
 
             #tournament for parent two
-            canidates = np.random.choice(self.population_size, tournament_size)
+            #canidates = np.random.choice(self.population_size, tournament_size)
+            canidates = list(range(self.population_size))
             parent2_idx[i] = canidates[np.argmax(fitness[canidates])]
         
         logger.info(f"self.population[parent1_idx].shape {self.population[parent1_idx].shape}")
@@ -217,9 +220,9 @@ class GeneticOptimizer:
                     offspring_route = [-1] * self.dimension
                     if self.problem_type == 'GPA':
                         offspring_route = np.empty((self.dimension,), dtype=action_duration_dtype)
-                        for i in range(len(offspring_route)):
-                            offspring_route[i]['action'] = "none"
-                            offspring_route[i]['duration'] = -1
+                        for j in range(len(offspring_route)):
+                            offspring_route[j]['action'] = "none"
+                            offspring_route[j]['duration'] = -1
                         offspring_route = list(offspring_route)
                     
                     # Copy segment from parent1
@@ -244,6 +247,11 @@ class GeneticOptimizer:
                         offspring_route[:point1] = remaining[:point1]
                     if point2 < self.dimension:
                         offspring_route[point2:] = remaining[point1:]
+
+                    for elem in offspring_route:
+                        if elem[0] == "":
+                            logger.error("empty action in GPA")
+                            raise Exception("empty element in GPA")
                     
                     # Convert back to numpy array
                     offspring[i] = np.array(offspring_route, dtype=elem_type)
@@ -286,8 +294,9 @@ class GeneticOptimizer:
         # use selection, mutation, and crossover to create next generation
         parents1, parents2 = self._select_parents(fitness)
         logger.info("before crossover")
-        offspring = self._crossover(parents1, parents2)
+        #offspring = self._crossover(parents1, parents2)
         logger.info("after crossover")
+        offspring = parents1
         self.population = self._mutate(offspring) 
         logger.info("after mutate")          
 
@@ -297,11 +306,10 @@ class GeneticOptimizer:
                 while self.generation < self.max_generations:
                     # Process generation
                     fitness_values = await self._evaluate_population(wait_for_frontend_callback,websocket)
-                    logger.info("finieshed eval")
-                    self._update_best_solution(fitness_values)
-                    logger.info("update best")
+                    logger.info(fitness_values)
+                    self._update_best_solution(fitness_values)               
                     self._create_next_generation(fitness_values)
-                    logger.info("finished next gen")
+                    logger.info(f"mutation rate: {self.mutation_rate}")
                     
                     # Calculate additional metrics
                     avg_fitness = np.mean(fitness_values)
@@ -320,10 +328,11 @@ class GeneticOptimizer:
                     }
                     
                     #logger.info(f"Generation {self.generation} complete. Best fitness: {self.best_fitness}")
-                    await update_callback(update_data)
+                    if self.problem_type == "tsp":
+                        await update_callback(update_data)
                     
                     # Control evolution speed
-                    await asyncio.sleep(0.1)
+                    await asyncio.sleep(.1)
                     self.generation += 1   
                 await close_callback()
         except Exception as e:

@@ -122,6 +122,10 @@ export default function GameComponent() {
 
   // Callback called when game completes
   const onGameOver = (scores:number[]) => {
+    if (gameOver){
+      return;
+    }
+
     console.log(`set scores: ${scores}`)
     setGameOver(true)
     if (singleOperation === null){
@@ -162,7 +166,7 @@ export default function GameComponent() {
         const data = JSON.parse(event.data);
         console.log('Received update:', data);
 
-        if (data || typeof data.best_fitness === 'number') {
+        if (data) {
           setEvolutionData(prev => [...prev, {
             generation: data.generation,
             best_fitness: data.best_fitness,
