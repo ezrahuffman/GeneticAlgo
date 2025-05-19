@@ -433,7 +433,7 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       <pointLight position={[10, 10, 10]} />
       {
       players.map((player, index) => (
-        <Player position={playerPositions[index]}/>
+        <Player key={index} position={playerPositions[index]}/>
       ))}
       
       {platforms.map((platform, index) => (

@@ -173,20 +173,20 @@ class GeneticOptimizer:
 
     def _select_parents(self, fitness: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         # select parents using tournament selection
-        tournament_size = self.population_size
+        tournament_size = 5
         parent1_idx = np.zeros(self.population_size, dtype=int)
         parent2_idx = np.zeros(self.population_size, dtype=int)
 
         for i in range(self.population_size):
             #tournament for parent one
-            #canidates = np.random.choice(self.population_size, tournament_size)
-            canidates = list(range(self.population_size))
+            canidates = np.random.choice(self.population_size, tournament_size)
+            #canidates = list(range(self.population_size))
             parent1_idx[i] = canidates[np.argmax(fitness[canidates])]
             #logger.info(self.population[parent1_idx[i]] )
 
             #tournament for parent two
-            #canidates = np.random.choice(self.population_size, tournament_size)
-            canidates = list(range(self.population_size))
+            canidates = np.random.choice(self.population_size, tournament_size)
+            #canidates = list(range(self.population_size))
             parent2_idx[i] = canidates[np.argmax(fitness[canidates])]
         # same = True
         
@@ -214,7 +214,6 @@ class GeneticOptimizer:
         logger.info(f"crossover rate: {self.crossover_rate}")
         for i in range(self.population_size):
             if np.random.random() < self.crossover_rate:
-                logger.error("Crossover")
                 if self.problem_type == 'tsp' or self.problem_type == 'GPA':
                     # Order crossover for TSP
                     # Select two random crossover points
@@ -308,9 +307,9 @@ class GeneticOptimizer:
         # use selection, mutation, and crossover to create next generation
         parents1, parents2 = self._select_parents(fitness)
         logger.info("before crossover")
-        #offspring = self._crossover(parents1, parents2)
+        offspring = self._crossover(parents1, parents2)
         logger.info("after crossover")
-        offspring = parents1
+        #offspring = parents1
         self.population = self._mutate(offspring) 
         same = True
         
