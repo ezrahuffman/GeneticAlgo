@@ -260,11 +260,11 @@ class GeneticOptimizer:
                         offspring_route[:point1] = remaining[:point1]
                     if point2 < self.dimension:
                         offspring_route[point2:] = remaining[point1:]
-
-                    for elem in offspring_route:
-                        if elem[0] == "":
-                            logger.error("empty action in GPA")
-                            raise Exception("empty element in GPA")
+                    if self.problem_type == "GPA":
+                        for elem in offspring_route:
+                            if elem[0] == "":
+                                logger.error("empty action in GPA")
+                                raise Exception("empty element in GPA")
                     
                     # Convert back to numpy array
                     offspring[i] = np.array(offspring_route, dtype=elem_type)
@@ -306,26 +306,8 @@ class GeneticOptimizer:
     def _create_next_generation(self, fitness: np.ndarray) -> None:
         # use selection, mutation, and crossover to create next generation
         parents1, parents2 = self._select_parents(fitness)
-        logger.info("before crossover")
         offspring = self._crossover(parents1, parents2)
-        logger.info("after crossover")
-        #offspring = parents1
-        self.population = self._mutate(offspring) 
-        same = True
-        
-        test_lst = self.population[0]
-        for lst in self.population:
-            fail = False
-            for k in range(len(lst)):
-                if (test_lst[k] != lst[k]):
-                    same = False
-                    logger.info(f"mismatch: {test_lst} != {lst}")
-                    break
-            if fail:
-                break
-        if same:
-            logger.info("all match")
-        logger.info("after mutate")          
+        self.population = self._mutate(offspring)         
 
 
     async def evolve(self, task_id: str, update_callback, close_callback,wait_for_frontend_callback, websocket=None) -> None:
@@ -336,7 +318,6 @@ class GeneticOptimizer:
                     logger.info(fitness_values)
                     self._update_best_solution(fitness_values)               
                     self._create_next_generation(fitness_values)
-                    logger.info(f"mutation rate: {self.mutation_rate}")
                     
                     # Calculate additional metrics
                     avg_fitness = np.mean(fitness_values)
