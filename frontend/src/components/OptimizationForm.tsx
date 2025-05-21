@@ -5,7 +5,7 @@ import * as RadixForm from '@radix-ui/react-form';
 import * as RadixSlider from '@radix-ui/react-slider';
 import "../styles/OptimizationForm.css"
 
-type City = [number, number];
+type City = {x:number, y:number};
 
 interface OptimizationFormData {
   problem_type: string;
@@ -35,7 +35,7 @@ const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning
       max_generations: 10,
       parameters: {
         cities: [
-          [0, 0], [1, 3], [2, 1], [3, 9], [5, 3],
+          {x:0, y:0}, {x:1, y:3}, {x:2, y:1}, {x:3, y:9}, {x:5, y:3},
         ] as City[],
       },
     },
@@ -58,7 +58,11 @@ const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning
   }, [fields, setValue]);
 
   const addCity = () => {
-    append([0, 0] as City, { shouldFocus: false });
+    console.log(`add city, cities.len: ${currentDimension}`);
+    const city : City = {x:0, y:0};
+    //console.log(`len of city: ${city.length}`)
+    append(city);
+    console.log(`cities.len: ${currentDimension}`);
   };
 
   const removeCity = (index: number) => {
@@ -210,7 +214,7 @@ const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning
                       <tr>
                         <th className='th'>X</th>
                         <th className='th'>Y</th>
-                        <th className='th th-action'></th> {/* approx w-16 */}
+                        {/* <th className='th th-action'></th> approx w-16 */}
                       </tr>
                     </thead>
                     <tbody>
@@ -223,7 +227,7 @@ const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning
                               `register` is often fine. For consistency with sliders:
                             */}
                             <Controller
-                                name={`parameters.cities.${index}.0`}
+                                name={`parameters.cities.${index}.x`}
                                 control={control}
                                 rules={{ required: "X is required" }}
                                 render={({ field, fieldState }) => (
@@ -241,7 +245,7 @@ const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning
                           </td>
                           <td className='td'>
                             <Controller
-                                name={`parameters.cities.${index}.1`}
+                                name={`parameters.cities.${index}.y`}
                                 control={control}
                                 rules={{ required: "Y is required" }}
                                 render={({ field, fieldState }) => (

@@ -140,6 +140,10 @@ export const OptimizationDashboard: React.FC = () => {
   const startNewTask = async (formData: any) => {
     try {
       console.log('Starting new optimization task...', formData);
+      const citiesAsObj = formData.parameters.cities;
+      formData.parameters.cities = formData.parameters.cities.map((val:City, index:number)=>{
+        return ([val.x, val.y])
+      })
       const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/tasks`, {
         method: 'POST',
         headers: {
@@ -154,10 +158,7 @@ export const OptimizationDashboard: React.FC = () => {
       setIsRunning(true);
       setEvolutionData([]);
       // Convert cities from formData format to visualization format
-      setCities(formData.parameters.cities.map((city: number[]) => ({
-        x: city[0],
-        y: city[1]
-      })));
+      setCities(citiesAsObj);
       connectToWebSocket(data.task_id);
 
     } catch (error) {
