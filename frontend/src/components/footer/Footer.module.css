@@ -1,0 +1,29 @@
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-top: 1px solid #3c4043; /* Separator line */
+    margin-top: 60px;
+  }
+  
+  .socialIcons {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .socialLink {
+    color: #bdc1c6;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .socialLink:hover {
+    color: #e8eaed;
+  }
+  
+  .resourcesText {
+    font-size: 0.9rem;
+    color: #bdc1c6;
+    letter-spacing: 0.5px;
+  }

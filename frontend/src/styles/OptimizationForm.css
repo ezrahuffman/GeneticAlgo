@@ -1,0 +1,191 @@
+/* General Styles */
+.form-font-family {
+    font-family: sans-serif;
+  }
+  
+  /* Card Styles */
+  .card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #FEEFD9;
+    /* font-family: sans-serif; /* Moved to a more general class or apply to body */
+  }
+  
+  .card-header {
+    margin-bottom: 16px;
+  }
+  
+  .card-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Form Element Styles */
+  .form-field {
+    margin-bottom: 16px;
+  }
+  
+  .label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+    color: #333;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .input-small { /* For city coordinate inputs */
+    width: 96px; /* approx w-24 from previous example */
+  }
+  
+  /* Button Styles */
+  .button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 8px;
+    background-color: #ebb96c;
+    color: white;
+    display: inline-flex; /* To align icon and text */
+    align-items: center; /* To align icon and text */
+  }
+  
+  .button-full-width {
+    width: 100%;
+    margin-top: 20px; /* From previous submit button style */
+  }
+  
+  .button-outline {
+    background-color: transparent;
+    border: 1px solid #ebb96c;
+    color: #ebb96c;
+    margin-top: 8px; /* From previous add city button style */
+  }
+  
+  .button-ghost {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    padding: 5px;
+    height: 32px; /* From previous remove city button style */
+    width: 32px;  /* From previous remove city button style */
+    display: inline-flex; /* To center icon */
+    align-items: center;  /* To center icon */
+    justify-content: center; /* To center icon */
+  }
+  
+  /* Table Styles */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .table-container { /* To wrap the table and apply border/padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px; /* From previous example */
+  }
+  
+  .th {
+    border-bottom: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    background: #f9f9f9;
+  }
+  
+  .th-action { /* For the empty header cell above action buttons */
+    width: 64px; /* approx w-16 from previous example */
+  }
+  
+  .td {
+    border-bottom: 1px solid #eee;
+    padding: 8px;
+  }
+  
+  /* Slider Styles (Radix UI Specific - you'll style the Radix parts) */
+  .slider-root {
+    position: relative;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    touch-action: none;
+    height: 20px;
+    width: 100%; /* Or specific width if needed */
+  }
+  
+  .slider-track {
+    background-color: #FEEFD9;
+    position: relative;
+    flex-grow: 1;
+    border-radius: 9999px;
+    height: 6px;
+  }
+  
+  .slider-range {
+    position: absolute;
+    background-color: #ebb96c;
+    border-radius: 9999px;
+    height: 100%;
+  }
+  
+  .slider-thumb {
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    border-radius: 10px; /* Or 50% for a circle */
+    cursor: pointer;
+  }
+  
+  .slider-thumb:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(#ebb96c, 0.4); /* Example focus style */
+  }
+  
+  
+  /* Utility Styles */
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 4px;
+  }
+  
+  .flex-container { /* For label and message alignment */
+    display: flex;
+    justify-content: space-between; /* If you want message on the right */
+    align-items: center;
+  }
+  
+  .label-grow { /* To make label take available space */
+    flex-grow: 1;
+  }
+  
+  .icon { /* For Lucide icons if they need specific sizing/spacing */
+    height: 16px;
+    width: 16px;
+  }
+  
+  .icon-mr { /* For icons with margin-right */
+    margin-right: 8px;
+  }
+  
+  /* Spacing utilities like in Tailwind (optional, but can be handy) */
+  .space-y-4 > *:not([hidden]) ~ *:not([hidden]) {
+      --tw-space-y-reverse: 0;
+      margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+      margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+  }
+  /* Add .space-y-6 if needed */

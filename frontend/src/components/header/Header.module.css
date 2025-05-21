@@ -1,0 +1,21 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: #1E1E1E;
+  }
+  
+  .navLink {
+    color: #bdc1c6; /* Slightly dimmer than main text for nav links */
+    margin-left: 24px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .navLink:hover {
+    color: #e8eaed;
+    text-decoration: none;
+  }

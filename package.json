@@ -8,6 +8,8 @@
         "install:all": "cd backend && pip install -r requirements.txt && cd ../frontend && npm install"
     },
     "devDependencies": {
-        "concurrently": "^8.0.1"
+        "@vitejs/plugin-react": "^4.4.1",
+        "concurrently": "^8.0.1",
+        "vite": "^6.3.2"
     }
 }

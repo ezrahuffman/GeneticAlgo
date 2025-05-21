@@ -140,7 +140,7 @@ export const OptimizationDashboard: React.FC = () => {
   const startNewTask = async (formData: any) => {
     try {
       console.log('Starting new optimization task...', formData);
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks`, {
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export const OptimizationDashboard: React.FC = () => {
     console.log(`Connecting to WebSocket for task ${taskId}...`);
     setWsStatus('connecting');
 
-    const ws = new WebSocket(`${process.env.REACT_APP_WS_URL}/ws/tasks/${taskId}`);
+    const ws = new WebSocket(`${import.meta.env.VITE_REACT_APP_WS_URL}/ws/tasks/${taskId}`);
 
     ws.onopen = () => {
       console.log('WebSocket connected');
@@ -226,6 +226,7 @@ export const OptimizationDashboard: React.FC = () => {
             <OptimizationForm 
               onSubmit={startNewTask}
               isRunning={isRunning}
+              problemType='tsp'
             />
           </div>
 

@@ -1,3 +1,4 @@
+import json
 from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .core.task_manager import TaskManager
@@ -23,7 +24,7 @@ app = FastAPI()
 task_manager = TaskManager()
 
 # Get environment variables with defaults
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 PORT = int(os.getenv('PORT', 8000))
 
 # Configure CORS
@@ -59,13 +60,40 @@ async def task_websocket(websocket: WebSocket, task_id: str):
 
         async def update_callback(data):
             await websocket.send_json(data)
+            
 
         async def close_callback():
             await task_manager.remove_task(task_id)
             await websocket.close()
 
-        await optimizer.evolve(task_id, update_callback, close_callback)
+        async def wait_for_frontend():
+            recieved = False
+            while not recieved:
+                logger.info("await recieve text from front-end")
+                data = await websocket.receive_text()
+                message = json.loads(data)
+                logger.info(f"Task {task_id}: Received message from client: {message}")
+                
+                if message.get("type") == "FITNESS_RESULTS":
+                    received_task_id = message.get("taskId")
+                    scores = message.get("scores")
+                    # generation = message.get("generation") # Optional: if you need to match generation
+
+                    if received_task_id == task_id and scores is not None:
+                        # Find the correct optimizer instance (already have it as `optimizer`)
+                        # and set its fitness results
+                        optimizer.set_gpa_fitness_results(scores)
+                    else:
+                        logger.warning(f"Task {task_id}: Received FITNESS_RESULTS for mismatched task ID {received_task_id} or missing scores.")
+                    
+                    recieved = True
+                # Handle other client messages if any (e.g., pause, resume, early stop)
+
+        await optimizer.evolve(task_id, update_callback, close_callback, wait_for_frontend, websocket=websocket)
+
+
     except Exception as e:
         logger.info(e)
         await task_manager.remove_task(task_id)
         await websocket.close(code=1011)
+
