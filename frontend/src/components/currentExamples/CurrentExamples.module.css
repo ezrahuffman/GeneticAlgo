@@ -1,0 +1,25 @@
+.currentExamplesSection {
+    padding-top: 40px;
+    padding-bottom: 60px;
+    background-color: #1E1E1E;
+  }
+  
+  .sectionTitle {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: #FFECD4;
+    margin-bottom: 4px;
+  }
+  
+  .sectionSubtitle {
+    font-size: 1rem;
+    color: #FEEFD9;
+    margin-top: 0;
+    margin-bottom: 30px;
+  }
+  
+  .examplesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }

@@ -1,0 +1,66 @@
+.aboutSection {
+    background-color: #292a2d; /* Darker background for this section */
+    padding-top: 60px;
+    padding-bottom: 60px;
+    margin-top: 40px; /* Space above this section */
+  }
+  
+  .sectionTitle {
+    font-size: 2rem; /* Larger title for this section */
+    font-weight: 600;
+    color: #FFECD4;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
+  .sectionSubtitle {
+    font-size: 1.1rem;
+    color: #FEEFD9;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 40px;
+  }
+  
+  .contentWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  @media (min-width: 768px) {
+    .contentWrapper {
+      flex-direction: row;
+      align-items: flex-start; /* Align items to the top */
+    }
+  }
+  
+  .imageContainer {
+    flex: 1 1 40%; /* Flex properties for responsiveness */
+    max-width: 100%;
+    text-align: center; /* Center image in its container */
+  }
+  
+  .flowchartImage {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #3c4043;
+  }
+  
+  .textContainer {
+    flex: 1 1 60%; /* Flex properties for responsiveness */
+    color: #FEEFD9;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+  
+  .textContainer h4 {
+    font-size: 1.2rem;
+    color: #FFECD4;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  .textContainer p {
+    margin-bottom: 16px;
+  }

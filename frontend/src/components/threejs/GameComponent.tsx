@@ -27,16 +27,10 @@ interface FitnessResultsMessage {
 
 // Main game component
 export default function GameComponent() {
-  const [score, setScore] = useState(0);
   const [gameStatus, setGameStatus] = useState('idle');
-  
-  const handleScore = () => {
-    setScore(prevScore => prevScore + 1);
-  };
   
   const startGame = () => {
     setGameStatus('playing');
-    setScore(0);
   };
 
 
@@ -239,11 +233,11 @@ export default function GameComponent() {
       </div>
       )}
       
-      {gameStatus === 'playing' && (
+      {/* {gameStatus === 'playing' && (
         <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded z-10">
           Score: {score}
         </div>
-      )}
+      )} */}
       
       <Canvas className="w-full h-full">
         <ambientLight intensity={0.5} />
