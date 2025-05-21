@@ -20,6 +20,22 @@
     margin-top: 0;
     margin-bottom: 40px;
   }
+
+  .subsectionTitle {
+    font-size: 2rem; /* Larger title for this section */
+    font-weight: 600;
+    color: #FFECD4;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+  
+  .subsectionSubtitle {
+    font-size: 1.1rem;
+    color: #FEEFD9;
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 40px;
+  }
   
   .contentWrapper {
     display: flex;

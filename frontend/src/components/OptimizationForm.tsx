@@ -130,7 +130,7 @@ const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning
               />
             </RadixForm.Field>
 
-            <RadixForm.Field name="dimension" className='form-field'>
+            {problemType === "GPA" && <RadixForm.Field name="dimension" className='form-field'>
                 <RadixForm.Label className='label'>
                     Moves Per Player ({(watch('dimension'))?.toFixed(0)}) [NOTE: The max runtime is 2s x (moves per player)]
                 </RadixForm.Label>
@@ -153,7 +153,7 @@ const OptimizationForm: React.FC<OptimizationFormProps> = ({ onSubmit, isRunning
                   </RadixSlider.Root>
                 )}
               />
-            </RadixForm.Field>
+            </RadixForm.Field>}
 
             <RadixForm.Field name="crossover_rate" className='form-field'>
                 <RadixForm.Label className='label'>

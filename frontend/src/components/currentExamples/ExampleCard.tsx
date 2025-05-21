@@ -2,15 +2,16 @@ import React from 'react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Info } from 'lucide-react';
 import styles from './ExampleCard.module.css';
+import { Link } from 'react-router';
 
 interface ExampleCardProps {
   title: string;
   description: string;
   tooltipContent: string;
-  onEnter: () => void;
+  linkPath:string;
 }
 
-const ExampleCard: React.FC<ExampleCardProps> = ({ title, description, tooltipContent, onEnter }) => {
+const ExampleCard: React.FC<ExampleCardProps> = ({ title, description, tooltipContent, linkPath }) => {
   return (
     <div className={styles.card}>
       <div className={styles.titleContainer}>
@@ -32,9 +33,11 @@ const ExampleCard: React.FC<ExampleCardProps> = ({ title, description, tooltipCo
         </Tooltip.Provider>
       </div>
       <p className={styles.description}>{description}</p>
-      <button className={`button-base ${styles.enterButton}`} onClick={onEnter}>
-        Enter
-      </button>
+      <Link to={linkPath}>
+        <button className={`button-base ${styles.enterButton}`}>
+          Enter
+        </button>
+      </Link>
     </div>
   );
 };

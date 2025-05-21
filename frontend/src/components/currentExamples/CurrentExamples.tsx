@@ -8,14 +8,14 @@ const examplesData = [
     title: 'Traveling Salesperson',
     description: 'Classic optimization problem to find the shortest possible route that visits each city exactly once and returns to the origin city.',
     tooltipContent: 'Explores various heuristic algorithms.',
-    onEnter: () => console.log('Entering Traveling Salesperson'),
+    linkPath: "/TSP",
   },
   {
     id: 'platformer',
     title: 'Platformer Game',
     description: 'Genetic algorithms can evolve AI behaviors for characters or generate interesting and challenging level designs very short lorem.',
     tooltipContent: 'AI agents learn to navigate levels.',
-    onEnter: () => console.log('Entering Platformer Game'),
+    linkPath: "/Game",
   },
 ];
 
@@ -31,7 +31,7 @@ const CurrentExamples: React.FC = () => {
             title={example.title}
             description={example.description}
             tooltipContent={example.tooltipContent}
-            onEnter={example.onEnter}
+            linkPath={example.linkPath}
           />
         ))}
       </div>
