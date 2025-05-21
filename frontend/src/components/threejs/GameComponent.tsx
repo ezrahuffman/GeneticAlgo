@@ -78,10 +78,9 @@ export default function GameComponent() {
   };
 
   const evaluateGPAFitness = async(
-    operationId: string = "singleOp",
     timeoutMs: number = 15000
   ): Promise<EvalData> => {
-    console.log(`eval population started, waiting on game over to be called...`)
+    console.log(`eval population started, waiting on game over to be called... timeout: ${timeoutMs/1000}`)
     startGame()
     setGameOver(false)
 
@@ -99,7 +98,7 @@ export default function GameComponent() {
         //     new Error(`Evaluation timed out after ${timeoutMs}ms. evaluateGPA was never called`)
         //   );
         // }
-        console.log("timedout")
+        console.log("timed out")
         setSingleOperation(null);
       }, timeoutMs)
       console.log("set single operation")
@@ -179,10 +178,8 @@ export default function GameComponent() {
           // setLastPopulation(message.population);
           // setTaskStatus(`Evaluating Generation ${message.generation} for ${message.taskId}...`);
           
-          // Assuming evaluateGPAFitness is an async function as in your example
-          const fitnessScores = await evaluateGPAFitness(data.population); 
-          //setLastFitnessResults(fitnessScores);
-          //console.log(`fitness scores ${fitnessScores.scores}`)
+          // The maximum time for each move is 2s so the maximum timout is 2 * number of moves + a little a padding for error
+          const fitnessScores = await evaluateGPAFitness(data.population[0]?.length * 2010); 
           
           // Prepare the message to send back to the backend
           const resultsMessage: FitnessResultsMessage = { // Ensure FitnessResultsMessage is defined

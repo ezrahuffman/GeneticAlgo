@@ -256,7 +256,7 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     }
     const totalTime = totalTimes[index];
     const inputIndex = inputIndices[index];
-    console.log(`set ${set}, realTime ${realTime}, totalTime ${totalTime}, inputI ${inputIndex}`)
+    //console.log(`set ${set}, realTime ${realTime}, totalTime ${totalTime}, inputI ${inputIndex}`)
     //console.log(`inputIndex ${inputIndex}, ${moves[index][0]}`)
     if (!set){
       handleInputDown(index, moves[index][0].action)
