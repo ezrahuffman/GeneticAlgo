@@ -56,8 +56,8 @@ export default function GameComponent() {
   const startNewTask = async (formData:any) => {
     try {
       console.log('Starting new optimization task...', formData);
-      console.log(`env.wsurl: ${import.meta.env.VITE_REACT_APP_API_URL}`)
-      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/tasks`, {
+      console.log(`env.wsurl: ${process.env.VITE_REACT_APP_API_URL}`)
+      const response = await fetch(`${process.env.VITE_REACT_APP_API_URL}/api/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,9 +145,9 @@ export default function GameComponent() {
   const connectToWebSocket = (taskId: string) => {
     console.log(`Connecting to WebSocket for task ${taskId}...`);
     setWsStatus('connecting');
-    console.log(`env.wsurl: ${import.meta.env.VITE_REACT_APP_WS_URL}`)
+    console.log(`env.wsurl: ${process.env.VITE_REACT_APP_WS_URL}`)
 
-    const ws = new WebSocket(`${import.meta.env.VITE_REACT_APP_WS_URL}/ws/tasks/${taskId}`);
+    const ws = new WebSocket(`${process.env.VITE_REACT_APP_WS_URL}/ws/tasks/${taskId}`);
 
     ws.onopen = () => {
       console.log('WebSocket connected');
