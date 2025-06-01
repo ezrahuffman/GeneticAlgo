@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import React, { useState } from 'react';
+import { Canvas } from '@react-three/fiber';
 import PlatformerGame from './PlatformerGame';
 import OptimizationForm from '../OptimizationForm';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
+import { Collapsible } from "radix-ui";
+import { RowSpacingIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { OrthographicCamera } from '@react-three/drei';
 
 interface EvolutionData {
   generation: number;
@@ -39,8 +42,9 @@ export default function GameComponent() {
   const [updateData, setUpdateData] = React.useState<EvolutionData[]>([]);
   const [currentTask, setCurrentTask] = React.useState<string | null>(null);
   const [isRunning, setIsRunning] = React.useState(false);
-  const [gameOver, setGameOver] = useState(false)
-  const [maxGeneration, setMaxGeneration] = useState(0)
+  const [gameOver, setGameOver] = useState(false);
+  const [maxGeneration, setMaxGeneration] = useState(0);
+  const [open, setOpen] = useState(false);
   // eslint-disable-next-line
   const [wsStatus, setWsStatus] = React.useState<string>('disconnected');
 
@@ -225,7 +229,7 @@ export default function GameComponent() {
   };
 
   return (
-    <div className="w-full h-screen relative" style={{height:'100vh'}}>
+    <div className="w-full h-screen relative" style={{height:'90vh'}}>
       {gameStatus === 'idle' && (
         <div className="lg:col-span-1">
         <OptimizationForm 
@@ -235,19 +239,46 @@ export default function GameComponent() {
         />
       </div>
       )}
-      
-      <Canvas className="w-full h-full">
+      {gameStatus === 'playing' && evolutionData.length >= 1 && (
+        
+      <Canvas className="w-full" style={{height:'80vh'}}>
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
+        <OrthographicCamera makeDefault position={[1, 1, 1]} 
+        left={-16*1.5}
+        right={16*1.5}
+        top={9*1.5 + 8}
+        bottom={-9*1.5 + 8}
+        near={0.1}
+        far={1000} />
         
-        {gameStatus === 'playing' && evolutionData.length >= 1 && (
-          <>
             <PlatformerGame onGameOverCallback={onGameOver} evolutionData={ evolutionData[evolutionData.length - 1].population} generation={evolutionData[evolutionData.length-1].generation} maxGeneration={maxGeneration}/>
-          </>
-        )}
-      </Canvas>
+          
+      </Canvas>)}
+      
+      <Collapsible.Root
+			className="CollapsibleRoot"
+			open={open}
+			onOpenChange={setOpen}
+		>
+			<div
+				style={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "start",
+				}}
+			>
+				<Collapsible.Trigger asChild>
+					<button className="IconButton">
+						{open ? <Cross2Icon /> : <RowSpacingIcon />}
+					</button>
+				</Collapsible.Trigger>
+        <span className="Text">Training Data</span>
+			</div>
 
+			
+      <Collapsible.Content>
       <Card>
               <CardHeader>
                 <CardTitle>Optimization Progress</CardTitle>
@@ -296,7 +327,9 @@ export default function GameComponent() {
                   </p>
                 )}
               </CardContent>
-            </Card>
+      </Card>
+      </Collapsible.Content>
+    </Collapsible.Root>
     </div>
   );
 }

@@ -25,7 +25,7 @@ const Platform = ({ position, width = 3, height = 1, winning = false} : Platform
 const Floor = () => {
   return (
     <mesh position={[0, -4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[20, 10]} />
+      <boxGeometry args={[20, 10, 1]} />
       <meshStandardMaterial color={platformColor} />
     </mesh>
   );
@@ -50,7 +50,8 @@ const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{on
   const [scores, setScores] = useState<number[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const camera = useThree((state)=>state.camera);
-  camera.position.set(0, 0, 30);
+  camera.position.set(0, 0, 15);
+  // camera.lookAt(0,10,0);
   const [players, setPlayers] = useState<number[]>([])
   const [moves, setMoves] = useState<MoveData[][]>([])
   const [inputIndices, setInputIndices] = useState<number[]>([])
@@ -448,7 +449,7 @@ const PlatformerGame = ({onGameOverCallback, evolutionData, generation, maxGener
       {evolutionData && (
         <>
       <Game onGameOverCallBack={onGameOverCallback} evolutionData={evolutionData} generation={generation} maxGeneration={maxGeneration}/>
-      <OrbitControls enableRotate={false} enableZoom={false} />
+      {/* <OrbitControls enableRotate={false} enableZoom={false} /> */}
       </>
       )
       }
