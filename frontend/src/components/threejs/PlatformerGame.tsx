@@ -44,7 +44,7 @@ const platforms : PlatformProps[] = [
 ];
 let set = false
 // Game component
-const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, evolutionData:MoveData[][]}) => {
+const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{onGameOverCallBack:Function, evolutionData:MoveData[][], generation:number, maxGeneration:number}) => {
   const winBonusAmount =  100;
   //const [input, setInput] = useState([0, 0, 0]);
   const [scores, setScores] = useState<number[]>([]);
@@ -432,20 +432,22 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
         fontSize={2}
         anchorX="center"
         anchorY="middle"
+        textAlign='center'
       >
-        State: {gameOver?"evolving":"playing"}
+        Generation: {generation+1}/{maxGeneration}{"\n"}
+        State: {gameOver?(generation+1 == maxGeneration ? "done":"evolving"):"playing"}
       </Text>
     </>
   );
 };
 
 // Main component
-const PlatformerGame = ({onGameOverCallback, evolutionData}:{onGameOverCallback:Function, evolutionData: MoveData[][]}) => {
+const PlatformerGame = ({onGameOverCallback, evolutionData, generation, maxGeneration}:{onGameOverCallback:Function, evolutionData: MoveData[][], generation:number, maxGeneration:number}) => {
   return (
       <>
       {evolutionData && (
         <>
-      <Game onGameOverCallBack={onGameOverCallback} evolutionData={evolutionData}/>
+      <Game onGameOverCallBack={onGameOverCallback} evolutionData={evolutionData} generation={generation} maxGeneration={maxGeneration}/>
       <OrbitControls enableRotate={false} enableZoom={false} />
       </>
       )

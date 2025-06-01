@@ -37,6 +37,7 @@ export default function GameComponent() {
   const [currentTask, setCurrentTask] = React.useState<string | null>(null);
   const [isRunning, setIsRunning] = React.useState(false);
   const [gameOver, setGameOver] = useState(false)
+  const [maxGeneration, setMaxGeneration] = useState(0)
   // eslint-disable-next-line
   const [wsStatus, setWsStatus] = React.useState<string>('disconnected');
 
@@ -70,7 +71,7 @@ export default function GameComponent() {
       setIsRunning(true);
       setEvolutionData([]);
       connectToWebSocket(data.task_id);
-
+      setMaxGeneration(formData.max_generations)
     } catch (error) {
       console.error('Error starting task:', error);
     }
@@ -226,7 +227,7 @@ export default function GameComponent() {
         
         {gameStatus === 'playing' && evolutionData.length >= 1 && (
           <>
-            <PlatformerGame onGameOverCallback={onGameOver} evolutionData={ evolutionData[evolutionData.length - 1].population}/>
+            <PlatformerGame onGameOverCallback={onGameOver} evolutionData={ evolutionData[evolutionData.length - 1].population} generation={evolutionData[evolutionData.length-1].generation} maxGeneration={maxGeneration}/>
           </>
         )}
       </Canvas>
