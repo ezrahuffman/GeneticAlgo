@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import PlatformerGame from './PlatformerGame';
 import OptimizationForm from '../OptimizationForm';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
 interface EvolutionData {
   generation: number;
@@ -34,6 +36,7 @@ export default function GameComponent() {
 
 
   const [evolutionData, setEvolutionData] = React.useState<EvolutionData[]>([]);
+  const [updateData, setUpdateData] = React.useState<EvolutionData[]>([]);
   const [currentTask, setCurrentTask] = React.useState<string | null>(null);
   const [isRunning, setIsRunning] = React.useState(false);
   const [gameOver, setGameOver] = useState(false)
@@ -153,14 +156,27 @@ export default function GameComponent() {
         console.log('Received update:', data);
 
         if (data) {
-          setEvolutionData(prev => [...prev, {
-            generation: data.generation,
-            best_fitness: data.best_fitness,
-            best_solution: data.best_solution,
-            average_fitness: data.average_fitness,
-            population_diversity: data.population_diversity,
-            population: data.population,
-          }]);
+          console.log(`best_fitness: ${data.best_fitness}`)
+          if (data.best_fitness != undefined){
+            setUpdateData(prev => [...prev, {
+              generation: data.generation,
+              best_fitness: data.best_fitness,
+              best_solution: data.best_solution,
+              average_fitness: data.average_fitness,
+              population_diversity: data.population_diversity,
+              population: data.population,
+            }]);
+          }
+          else {
+            setEvolutionData(prev => [...prev, {
+              generation: data.generation,
+              best_fitness: data.best_fitness,
+              best_solution: data.best_solution,
+              average_fitness: data.average_fitness,
+              population_diversity: data.population_diversity,
+              population: data.population,
+            }]);
+          }
           //setEvolutionData(evolutionData.best_solution)
         } else{
           console.log(`is type of number: ${typeof data.best_fitness === 'number'}`)
@@ -231,6 +247,56 @@ export default function GameComponent() {
           </>
         )}
       </Canvas>
+
+      <Card>
+              <CardHeader>
+                <CardTitle>Optimization Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {updateData.length > 0 ? (
+                  <LineChart
+                    data={updateData}
+                    width={500}
+                    height={400}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="generation" 
+                      label={{ value: 'Generation', position: 'bottom' }} 
+                    />
+                    <YAxis 
+                      label={{ value: 'Fitness', angle: -90, position: 'insideLeft' }} 
+                    />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="best_fitness"
+                      stroke="#3b82f6"
+                      name="Best Fitness"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="average_fitness"
+                      stroke="#22c55e"
+                      name="Average Fitness"
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="population_diversity"
+                      stroke="#eab308"
+                      name="Diversity"
+                      dot={false}
+                    />
+                  </LineChart>
+                ) : (
+                  <p className="text-center py-20 text-muted-foreground">
+                    No data yet. Start an optimization task to see results.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
     </div>
   );
 }

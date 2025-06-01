@@ -324,20 +324,32 @@ class GeneticOptimizer:
                     diversity = np.std(fitness_values)
                     
                     # Send update
-                    update_data = {
-                        'task_id': task_id,
-                        'generation': self.generation,
-                        'best_fitness': -float(self.best_fitness),
-                        #'current_fitness': 14,
-                        'best_solution': self.best_solution.tolist(),
-                        'average_fitness': -avg_fitness,
-                        'population_diversity': diversity,
-                        'status': 'running'
-                    }
+                    if self.problem_type == 'tsp':
+                        update_data = {
+                            'task_id': task_id,
+                            'generation': self.generation,
+                            'best_fitness': -float(self.best_fitness),
+                            #'current_fitness': 14,
+                            'best_solution': self.best_solution.tolist(),
+                            'average_fitness': -avg_fitness,
+                            'population_diversity': diversity,
+                            'status': 'running'
+                        }
+                    else:
+                        update_data = {
+                            'task_id': task_id,
+                            'generation': self.generation,
+                            'best_fitness': float(self.best_fitness),
+                            #'current_fitness': 14,
+                            'best_solution': self.best_solution.tolist(),
+                            'average_fitness': avg_fitness,
+                            'population_diversity': diversity,
+                            'status': 'running'
+                        }
                     
                     #logger.info(f"Generation {self.generation} complete. Best fitness: {self.best_fitness}")
-                    if self.problem_type == "tsp":
-                        await update_callback(update_data)
+                    #if self.problem_type == "tsp":
+                    await update_callback(update_data)
                     
                     # Control evolution speed
                     await asyncio.sleep(.1)
