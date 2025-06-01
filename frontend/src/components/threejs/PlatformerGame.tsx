@@ -49,8 +49,6 @@ const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{on
   //const [input, setInput] = useState([0, 0, 0]);
   const [scores, setScores] = useState<number[]>([]);
   const [gameOver, setGameOver] = useState(false);
-  const camera = useThree((state)=>state.camera);
-  camera.position.set(0, 0, 15);
   // camera.lookAt(0,10,0);
   const [players, setPlayers] = useState<number[]>([])
   const [moves, setMoves] = useState<MoveData[][]>([])
@@ -158,7 +156,6 @@ const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{on
       temp[index] = won? 2: 1;
       setPlayers(temp);
     }
-    console.log(`players done: ${pDone}`)
     if (pDone >= evolutionData.length && !gameOver){
       GameOver();
     }
@@ -444,6 +441,77 @@ const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{on
 
 // Main component
 const PlatformerGame = ({onGameOverCallback, evolutionData, generation, maxGeneration}:{onGameOverCallback:Function, evolutionData: MoveData[][], generation:number, maxGeneration:number}) => {
+  const { camera, gl } = useThree();
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const container = canvas;
+
+    if (!container) {
+      console.error("Canvas container not found for ResizeObserver.");
+      return;
+    }
+
+    const handleResizeInternal = () => {
+      console.log(`handle resize: ${camera}`)
+      // Ensure container has valid dimensions to prevent errors with aspect ratio calculation
+      if (container.clientWidth <= 0 || container.clientHeight <= 0) {
+        return;
+      }
+
+      if (camera instanceof THREE.OrthographicCamera) {
+        const newAspect = container.clientWidth / container.clientHeight;
+
+        // Derive desired world height and Y-shift from your initial camera setup
+        // in GameComponent.tsx:
+        // top={9*1.5 + 8} => 21.5
+        // bottom={-9*1.5 + 8} => -5.5
+        // Initial worldHeight = 21.5 - (-5.5) = 27
+        // Initial yShift = (21.5 + (-5.5)) / 2 = 8
+        const idealContainerHeight = 700; // e.g., The pixel height of 80vh on a target screen
+        const baseWorldHeight = 27;
+        const currentContainerPixelHeight = container.clientHeight;
+
+        const scalingFactor = idealContainerHeight / currentContainerPixelHeight;
+        const dynamicWorldHeight = baseWorldHeight * scalingFactor;
+        const yShift = 8;
+
+        camera.top = dynamicWorldHeight / 2 + yShift;
+        camera.bottom = -dynamicWorldHeight / 2 + yShift;
+        camera.left = (dynamicWorldHeight * newAspect) / -2; // Assumes X-axis is centered (xShift = 0)
+        camera.right = (dynamicWorldHeight * newAspect) / 2;
+
+        camera.updateProjectionMatrix();
+        
+        // R3F typically handles renderer.setSize, but if you notice issues,
+        // you might need to uncomment this. Be cautious as it can interfere.
+        gl.setSize(container.clientWidth, container.clientHeight, false);
+        
+        console.log(
+          `Camera resized: L:${camera.left.toFixed(1)} R:${camera.right.toFixed(1)} ` +
+          `T:${camera.top.toFixed(1)} B:${camera.bottom.toFixed(1)} Aspect:${newAspect.toFixed(2)}` +
+          `current container height: ${currentContainerPixelHeight}`
+        );
+      }
+    };
+
+    // Use ResizeObserver to detect changes in the container's size
+    const resizeObserver = new ResizeObserver(() => {
+      // console.log("ResizeObserver: Canvas container dimensions changed.");
+      handleResizeInternal();
+    });
+
+    resizeObserver.observe(container);
+
+    // Initial call to set camera correctly when component mounts
+    handleResizeInternal();
+
+    // Cleanup
+    return () => {
+      resizeObserver.unobserve(container);
+    };
+  }, [camera, gl]); // Effect dependencies
+
   return (
       <>
       {evolutionData && (

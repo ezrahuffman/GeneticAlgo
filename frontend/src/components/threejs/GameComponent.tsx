@@ -229,7 +229,7 @@ export default function GameComponent() {
   };
 
   return (
-    <div className="w-full h-screen relative" style={{height:'90vh'}}>
+    <div className="w-full h-screen relative" style={{height:'100vh'}}>
       {gameStatus === 'idle' && (
         <div className="lg:col-span-1">
         <OptimizationForm 
@@ -241,11 +241,11 @@ export default function GameComponent() {
       )}
       {gameStatus === 'playing' && evolutionData.length >= 1 && (
         
-      <Canvas className="w-full" style={{height:'80vh'}}>
+      <Canvas className="w-full" style={{height:'80%'}}>
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
-        <OrthographicCamera makeDefault position={[1, 1, 1]} 
+        <OrthographicCamera makeDefault={true} position={[1, 1, 1]} 
         left={-16*1.5}
         right={16*1.5}
         top={9*1.5 + 8}
