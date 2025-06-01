@@ -426,15 +426,15 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       
       <Floor />
       
-      {/* <Text
-        position={[0, 0 + 4, 0]}
+      <Text
+        position={[0, 15, 0]}
         color="black"
         fontSize={2}
         anchorX="center"
         anchorY="middle"
       >
-        Score: {}
-      </Text> */}
+        State: {gameOver?"evolving":"playing"}
+      </Text>
     </>
   );
 };
