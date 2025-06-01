@@ -7,14 +7,14 @@ const examplesData = [
     id: 'tsp',
     title: 'Traveling Salesperson',
     description: 'Classic optimization problem to find the shortest possible route that visits each city exactly once and returns to the origin city.',
-    tooltipContent: 'Explores various heuristic algorithms.',
+    tooltipContent: 'Resource Link (Coming Soon)',
     linkPath: "/TSP",
   },
   {
     id: 'platformer',
     title: 'Platformer Game',
-    description: 'Genetic algorithms can evolve AI behaviors for characters or generate interesting and challenging level designs very short lorem.',
-    tooltipContent: 'AI agents learn to navigate levels.',
+    description: 'Game playing agent that solves a simple platformer.',
+    tooltipContent: 'Resource Link (Coming Soon)',
     linkPath: "/Game",
   },
 ];
