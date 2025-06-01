@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -9,13 +9,14 @@ let callGameOver = true;
 interface PlatformProps {position:THREE.Vector3, width: number, height : number, winning?: boolean };
 type MoveData = {action:string, duration:number};
 
+const platformColor = "#FEEFD9"
 
 // Platform component
 const Platform = ({ position, width = 3, height = 1, winning = false} : PlatformProps) => {
   return (
     <mesh position={position}>
       <boxGeometry args={[width, height, height]} />
-      <meshStandardMaterial color={winning? "royalblue" : "limegreen"} />
+      <meshStandardMaterial color={winning? "gold" : platformColor} />
     </mesh>
   );
 };
@@ -25,7 +26,7 @@ const Floor = () => {
   return (
     <mesh position={[0, -4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[20, 10]} />
-      <meshStandardMaterial color="royalblue" />
+      <meshStandardMaterial color={platformColor} />
     </mesh>
   );
 };
@@ -155,7 +156,6 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       let temp = players;
       temp[index] = won? 2: 1;
       setPlayers(temp);
-      //console.log(`players done: ${playersDone}`)
     }
     console.log(`players done: ${pDone}`)
     if (pDone >= evolutionData.length && !gameOver){
@@ -170,12 +170,6 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
   }
 
   const GameOver = () => {
-    // if (won){
-    //   alert("Game Over, You Won");
-    // }
-    // else{
-    //   alert("Game Over, Loser");
-    // }
     if (callGameOver){
       console.log(`gameOver Callback ${playersDone}`)
       onGameOverCallBack(scores)
@@ -185,13 +179,6 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     }
   }
 
-  // type customInput = {
-  //   control:string,
-  //   time:number,
-  // }
-  //const inputs: MoveData[] = [{control:"left", time:1},{control:"jump", time:1},{control:"right",time: 0.25}, {control:"jump",time:0.1}, {control:"default", time:2}]
-
-  // Input handling
   
   const updateInput = (index:number, new_inputs:number[]) => {
     let newArr = inputs;
@@ -246,9 +233,6 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       };
   };
 
-  //TODO: this needs to be done for every player, not just once 
-  //Realtime can be shared, but totaltime is part of each player
-  //const [inputIndex, setInputIndex] = useState(0);
   const onTimeUpdate = (index:number, delta:number) => {
     if (moves.length < 1){
       
@@ -256,8 +240,6 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     }
     const totalTime = totalTimes[index];
     const inputIndex = inputIndices[index];
-    //console.log(`set ${set}, realTime ${realTime}, totalTime ${totalTime}, inputI ${inputIndex}`)
-    //console.log(`inputIndex ${inputIndex}, ${moves[index][0]}`)
     if (!set){
       handleInputDown(index, moves[index][0].action)
       set = true
@@ -288,11 +270,6 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
     }
   }
                   
-  // // Score based on height
-  // useEffect(() => {
-  //   const newScore = Math.max(0, Math.floor((playerPosition.y + 3) * 10));
-  //   setScore(newScore);
-  // }, [playerPosition.y]);
   const onPlayerPositionChange = (index:number, newPos:THREE.Vector3) => {
     let tempArr = playerPositions;
     tempArr[index] = new THREE.Vector3(newPos.x, newPos.y, newPos.z);
@@ -449,15 +426,15 @@ const Game = ({onGameOverCallBack, evolutionData}:{onGameOverCallBack:Function, 
       
       <Floor />
       
-      <Text
+      {/* <Text
         position={[0, 0 + 4, 0]}
         color="black"
         fontSize={2}
         anchorX="center"
         anchorY="middle"
       >
-        Score: {players.length}
-      </Text>
+        Score: {}
+      </Text> */}
     </>
   );
 };

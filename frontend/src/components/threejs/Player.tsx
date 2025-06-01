@@ -5,12 +5,13 @@ import PlayerProps from '@/src/interfaces/PlayerProps';
 
 const Player = ({ position } : PlayerProps) => {
    const ref = useRef(null);
+   const playerColor = "#ebb96c"
 
   return (
     <mesh ref={ref} position={position}>
       
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="hotpink" />
+      <meshStandardMaterial color={playerColor} />
     </mesh>
   );
 };

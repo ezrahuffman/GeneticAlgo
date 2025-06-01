@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Mesh } from 'three';
 import PlatformerGame from './PlatformerGame';
 import OptimizationForm from '../OptimizationForm';
 
@@ -106,14 +105,6 @@ export default function GameComponent() {
     });
   };
 
-  // const evaluateGPAFitness = async (population:any):Promise<void> => {
-  //   startGame()
-  //   setGameOver(false)
-  //   while(!gameOver){
-  //   }
-  //   return
-  // };
-
   // Callback called when game completes
   const onGameOver = (scores:number[]) => {
     if (gameOver){
@@ -175,8 +166,6 @@ export default function GameComponent() {
         }
         
         if (data.type && data.type === 'EVALUATE_POPULATION'){
-          // setLastPopulation(message.population);
-          // setTaskStatus(`Evaluating Generation ${message.generation} for ${message.taskId}...`);
           
           // The maximum time for each move is 2s so the maximum timout is 2 * number of moves + a little a padding for error
           const fitnessScores = await evaluateGPAFitness(data.population[0]?.length * 2010); 
@@ -229,12 +218,6 @@ export default function GameComponent() {
         />
       </div>
       )}
-      
-      {/* {gameStatus === 'playing' && (
-        <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded z-10">
-          Score: {score}
-        </div>
-      )} */}
       
       <Canvas className="w-full h-full">
         <ambientLight intensity={0.5} />
