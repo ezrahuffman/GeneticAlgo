@@ -141,10 +141,20 @@ const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{on
     
   }
 
+  const varietyBonus = (playerMoves:MoveData[]) => {
+    let bonus = 0;
+    let moveTypes = new Set<string>();
+    for (let i = 0; i < playerMoves.length; i++) {
+      moveTypes.add(playerMoves[i].action);
+    }
+    bonus = moveTypes.size * 10;
+    return bonus;
+  }
+
   const playerDone = (index:number, won:Boolean, invalidInput = false) => {
     const winBonus = won ? winBonusAmount : 0;
     // floor is at a height of -4 so add 4 to prevent negative scores
-    const playerScore = invalidInput? -1000 : ((playerPositions[index].y + 4) * 10) + winBonus;
+    const playerScore = invalidInput? -1000 : ((playerPositions[index].y + 4) * 10) + winBonus + varietyBonus(moves[index]);
     let tempArr = scores;
     tempArr[index] = playerScore;
     setScores(tempArr);
@@ -310,7 +320,7 @@ const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{on
       let velocity = playerVelocities[index];
       let isJumping = playerIsJumpings[index];
       const timeScale = 1;
-      const gravity = 1;
+      const gravity = .5;
       const jumpForce = 40;
       const moveSpeed = 5;
 
