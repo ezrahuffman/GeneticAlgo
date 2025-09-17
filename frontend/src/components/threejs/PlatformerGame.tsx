@@ -311,7 +311,7 @@ const Game = ({onGameOverCallBack, evolutionData, generation, maxGeneration}:{on
       let isJumping = playerIsJumpings[index];
       const timeScale = 1;
       const gravity = 1;
-      const jumpForce = 25;
+      const jumpForce = 40;
       const moveSpeed = 5;
 
       if(players[index] !== 0){
