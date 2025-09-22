@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI, WebSocket, HTTPException
+from fastapi import FastAPI, WebSocket, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from .core.task_manager import TaskManager
 from .models.schemas import OptimizationRequest, TaskResponse
