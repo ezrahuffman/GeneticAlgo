@@ -37,7 +37,17 @@ app.add_middleware(
 )
 
 @app.get("/health")
-async def health_check():
+async def health_check(request: Request):
+    # Directly inspect the headers that the application is receiving
+    forwarded_for = request.headers.get("x-forwarded-for")
+    
+    # This is what Uvicorn logs by default
+    client_host = request.client.host
+
+    print("--- DEBUGGING HEADERS ---")
+    print(f"From request.client.host: {client_host}")
+    print(f"From x-forwarded-for header: {forwarded_for}")
+    print("-------------------------")
     return {"status":"healthy"}
 
 @app.post("/api/tasks", response_model=TaskResponse)
