@@ -347,7 +347,7 @@ class GeneticOptimizer:
                             'status': 'running'
                         }
                     
-                    #logger.info(f"Generation {self.generation} complete. Best fitness: {self.best_fitness}")
+                    logger.info(f"Generation {self.generation} complete. Best fitness: {self.best_fitness}")
                     #if self.problem_type == "tsp":
                     await update_callback(update_data)
                     
