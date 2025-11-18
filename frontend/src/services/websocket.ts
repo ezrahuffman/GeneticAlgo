@@ -36,7 +36,7 @@ export class WebSocketClient {
 }
 
 // frontend/src/services/api.ts
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = import.meta.env.VITE_REACT_APP_WS_URL;
 
 export const createOptimizationTask = async (config: OptimizationConfig) => {
     const response = await fetch(`${API_URL}/api/optimize`, {
